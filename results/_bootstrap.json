@@ -5,12 +5,12 @@
   "models": {
     "Qwen3.5-35B-A3B": {
       "translate": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.225,
-        "ci_lo": 0.2028,
-        "ci_hi": 0.248,
-        "half_width": 0.0226
+        "mean": 0.728,
+        "ci_lo": 0.68,
+        "ci_hi": 0.776,
+        "half_width": 0.048
       },
       "punctuate": {
         "metric": "punct_f1",
@@ -21,12 +21,12 @@
         "half_width": 0.0624
       },
       "char-gloss": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.1753,
-        "ci_lo": 0.1221,
-        "ci_hi": 0.2285,
-        "half_width": 0.0532
+        "mean": 0.62,
+        "ci_lo": 0.566,
+        "ci_hi": 0.67,
+        "half_width": 0.052
       },
       "idiom-source": {
         "metric": "book_em",
@@ -45,36 +45,36 @@
         "half_width": 0.09
       },
       "_avg": {
-        "mean": 0.4067,
-        "ci_lo": 0.3763,
-        "ci_hi": 0.4397,
-        "half_width": 0.0317
+        "mean": 0.5962,
+        "ci_lo": 0.5656,
+        "ci_hi": 0.6305,
+        "half_width": 0.0324
       }
     },
     "claude-haiku-4-5-20251001": {
       "translate": {
-        "metric": "chrf",
-        "n": 100,
-        "mean": 0.2036,
-        "ci_lo": 0.1806,
-        "ci_hi": 0.2279,
-        "half_width": 0.0237
+        "metric": "judge_norm",
+        "n": 98,
+        "mean": 0.6755,
+        "ci_lo": 0.6245,
+        "ci_hi": 0.7224,
+        "half_width": 0.049
       },
       "punctuate": {
         "metric": "punct_f1",
         "n": 100,
         "mean": 0.7287,
-        "ci_lo": 0.665,
-        "ci_hi": 0.7907,
-        "half_width": 0.0629
+        "ci_lo": 0.6652,
+        "ci_hi": 0.7902,
+        "half_width": 0.0625
       },
       "char-gloss": {
-        "metric": "chrf",
-        "n": 100,
-        "mean": 0.1279,
-        "ci_lo": 0.0835,
-        "ci_hi": 0.1802,
-        "half_width": 0.0483
+        "metric": "judge_norm",
+        "n": 99,
+        "mean": 0.5778,
+        "ci_lo": 0.5212,
+        "ci_hi": 0.6364,
+        "half_width": 0.0576
       },
       "idiom-source": {
         "metric": "book_em",
@@ -101,36 +101,36 @@
         "half_width": 0.0086
       },
       "_avg": {
-        "mean": 0.3062,
-        "ci_lo": 0.2801,
-        "ci_hi": 0.3326,
-        "half_width": 0.0262
+        "mean": 0.4598,
+        "ci_lo": 0.4315,
+        "ci_hi": 0.4884,
+        "half_width": 0.0284
       }
     },
     "claude-opus-4-7-thinking": {
       "translate": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.2419,
-        "ci_lo": 0.2194,
-        "ci_hi": 0.2658,
-        "half_width": 0.0232
+        "mean": 0.802,
+        "ci_lo": 0.758,
+        "ci_hi": 0.844,
+        "half_width": 0.043
       },
       "punctuate": {
         "metric": "punct_f1",
         "n": 100,
         "mean": 0.7899,
-        "ci_lo": 0.7194,
-        "ci_hi": 0.8498,
-        "half_width": 0.0652
+        "ci_lo": 0.7207,
+        "ci_hi": 0.8501,
+        "half_width": 0.0647
       },
       "char-gloss": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.2073,
-        "ci_lo": 0.1549,
-        "ci_hi": 0.262,
-        "half_width": 0.0535
+        "mean": 0.736,
+        "ci_lo": 0.692,
+        "ci_hi": 0.78,
+        "half_width": 0.044
       },
       "idiom-source": {
         "metric": "book_em",
@@ -152,97 +152,97 @@
         "metric": "efficiency",
         "n": 100,
         "mean": 0.0911,
-        "ci_lo": 0.0673,
-        "ci_hi": 0.1173,
-        "half_width": 0.025
+        "ci_lo": 0.0656,
+        "ci_hi": 0.1168,
+        "half_width": 0.0256
       },
       "_avg": {
-        "mean": 0.4734,
-        "ci_lo": 0.4494,
-        "ci_hi": 0.497,
-        "half_width": 0.0238
+        "mean": 0.6548,
+        "ci_lo": 0.6288,
+        "ci_hi": 0.679,
+        "half_width": 0.0251
       }
     },
     "claude-opus-4-7": {
       "translate": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.2436,
-        "ci_lo": 0.2179,
-        "ci_hi": 0.2697,
-        "half_width": 0.0259
+        "mean": 0.8,
+        "ci_lo": 0.758,
+        "ci_hi": 0.84,
+        "half_width": 0.041
       },
       "punctuate": {
         "metric": "punct_f1",
         "n": 100,
         "mean": 0.8002,
-        "ci_lo": 0.7321,
-        "ci_hi": 0.8588,
-        "half_width": 0.0633
+        "ci_lo": 0.7317,
+        "ci_hi": 0.8586,
+        "half_width": 0.0634
       },
       "char-gloss": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.2126,
-        "ci_lo": 0.1578,
-        "ci_hi": 0.2692,
-        "half_width": 0.0557
+        "mean": 0.716,
+        "ci_lo": 0.664,
+        "ci_hi": 0.764,
+        "half_width": 0.05
       },
       "idiom-source": {
         "metric": "book_em",
         "n": 100,
         "mean": 0.65,
         "ci_lo": 0.56,
-        "ci_hi": 0.75,
-        "half_width": 0.095
+        "ci_hi": 0.74,
+        "half_width": 0.09
       },
       "fill-in": {
         "metric": "exact_match",
         "n": 100,
         "mean": 0.86,
         "ci_lo": 0.79,
-        "ci_hi": 0.93,
-        "half_width": 0.07
+        "ci_hi": 0.92,
+        "half_width": 0.065
       },
       "compress": {
         "metric": "efficiency",
         "n": 100,
         "mean": 0.1467,
-        "ci_lo": 0.1128,
-        "ci_hi": 0.1817,
-        "half_width": 0.0344
+        "ci_lo": 0.1142,
+        "ci_hi": 0.1814,
+        "half_width": 0.0336
       },
       "_avg": {
-        "mean": 0.4855,
-        "ci_lo": 0.4597,
-        "ci_hi": 0.5091,
-        "half_width": 0.0247
+        "mean": 0.6622,
+        "ci_lo": 0.6374,
+        "ci_hi": 0.6855,
+        "half_width": 0.0241
       }
     },
     "claude-sonnet-4-6": {
       "translate": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.2305,
-        "ci_lo": 0.2093,
-        "ci_hi": 0.2531,
-        "half_width": 0.0219
+        "mean": 0.776,
+        "ci_lo": 0.728,
+        "ci_hi": 0.822,
+        "half_width": 0.047
       },
       "punctuate": {
         "metric": "punct_f1",
         "n": 100,
         "mean": 0.7853,
-        "ci_lo": 0.718,
-        "ci_hi": 0.8484,
-        "half_width": 0.0652
+        "ci_lo": 0.7195,
+        "ci_hi": 0.8448,
+        "half_width": 0.0626
       },
       "char-gloss": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.1565,
-        "ci_lo": 0.1162,
-        "ci_hi": 0.2037,
-        "half_width": 0.0438
+        "mean": 0.694,
+        "ci_lo": 0.644,
+        "ci_hi": 0.742,
+        "half_width": 0.049
       },
       "idiom-source": {
         "metric": "book_em",
@@ -264,41 +264,41 @@
         "metric": "efficiency",
         "n": 100,
         "mean": 0.1628,
-        "ci_lo": 0.1423,
-        "ci_hi": 0.1855,
-        "half_width": 0.0216
+        "ci_lo": 0.1414,
+        "ci_hi": 0.1858,
+        "half_width": 0.0222
       },
       "_avg": {
-        "mean": 0.4325,
-        "ci_lo": 0.4045,
-        "ci_hi": 0.4577,
-        "half_width": 0.0266
+        "mean": 0.613,
+        "ci_lo": 0.5852,
+        "ci_hi": 0.6395,
+        "half_width": 0.0271
       }
     },
     "deepseek-3.2": {
       "translate": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.2399,
-        "ci_lo": 0.2159,
-        "ci_hi": 0.2664,
-        "half_width": 0.0252
+        "mean": 0.754,
+        "ci_lo": 0.708,
+        "ci_hi": 0.798,
+        "half_width": 0.045
       },
       "punctuate": {
         "metric": "punct_f1",
         "n": 100,
         "mean": 0.7446,
-        "ci_lo": 0.6732,
-        "ci_hi": 0.8112,
-        "half_width": 0.069
+        "ci_lo": 0.672,
+        "ci_hi": 0.8135,
+        "half_width": 0.0707
       },
       "char-gloss": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.1387,
-        "ci_lo": 0.0948,
-        "ci_hi": 0.1866,
-        "half_width": 0.0459
+        "mean": 0.538,
+        "ci_lo": 0.476,
+        "ci_hi": 0.596,
+        "half_width": 0.06
       },
       "idiom-source": {
         "metric": "book_em",
@@ -320,41 +320,41 @@
         "metric": "efficiency",
         "n": 100,
         "mean": 0.1632,
-        "ci_lo": 0.1449,
-        "ci_hi": 0.183,
-        "half_width": 0.019
+        "ci_lo": 0.1443,
+        "ci_hi": 0.1825,
+        "half_width": 0.0191
       },
       "_avg": {
-        "mean": 0.4294,
-        "ci_lo": 0.4029,
-        "ci_hi": 0.4564,
-        "half_width": 0.0268
+        "mean": 0.5816,
+        "ci_lo": 0.5519,
+        "ci_hi": 0.6091,
+        "half_width": 0.0286
       }
     },
     "glm-5": {
       "translate": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.2411,
-        "ci_lo": 0.216,
-        "ci_hi": 0.2672,
-        "half_width": 0.0256
+        "mean": 0.748,
+        "ci_lo": 0.702,
+        "ci_hi": 0.792,
+        "half_width": 0.045
       },
       "punctuate": {
         "metric": "punct_f1",
         "n": 100,
         "mean": 0.7988,
-        "ci_lo": 0.7332,
-        "ci_hi": 0.8595,
+        "ci_lo": 0.7339,
+        "ci_hi": 0.8602,
         "half_width": 0.0632
       },
       "char-gloss": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.1762,
-        "ci_lo": 0.1283,
-        "ci_hi": 0.2265,
-        "half_width": 0.0491
+        "mean": 0.638,
+        "ci_lo": 0.582,
+        "ci_hi": 0.692,
+        "half_width": 0.055
       },
       "idiom-source": {
         "metric": "book_em",
@@ -369,48 +369,48 @@
         "n": 100,
         "mean": 0.45,
         "ci_lo": 0.35,
-        "ci_hi": 0.54,
-        "half_width": 0.095
+        "ci_hi": 0.55,
+        "half_width": 0.1
       },
       "compress": {
         "metric": "efficiency",
         "n": 100,
         "mean": 0.1532,
-        "ci_lo": 0.1358,
-        "ci_hi": 0.1728,
-        "half_width": 0.0185
+        "ci_lo": 0.1356,
+        "ci_hi": 0.1724,
+        "half_width": 0.0184
       },
       "_avg": {
-        "mean": 0.4266,
-        "ci_lo": 0.4007,
-        "ci_hi": 0.4521,
-        "half_width": 0.0257
+        "mean": 0.588,
+        "ci_lo": 0.5623,
+        "ci_hi": 0.614,
+        "half_width": 0.0258
       }
     },
     "minimax-m2.1": {
       "translate": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.2161,
-        "ci_lo": 0.1934,
-        "ci_hi": 0.2387,
-        "half_width": 0.0226
+        "mean": 0.704,
+        "ci_lo": 0.65,
+        "ci_hi": 0.754,
+        "half_width": 0.052
       },
       "punctuate": {
         "metric": "punct_f1",
         "n": 100,
         "mean": 0.7085,
-        "ci_lo": 0.6339,
-        "ci_hi": 0.7735,
-        "half_width": 0.0698
+        "ci_lo": 0.6349,
+        "ci_hi": 0.7791,
+        "half_width": 0.0721
       },
       "char-gloss": {
-        "metric": "chrf",
-        "n": 100,
-        "mean": 0.1729,
-        "ci_lo": 0.1267,
-        "ci_hi": 0.2241,
-        "half_width": 0.0487
+        "metric": "judge_norm",
+        "n": 99,
+        "mean": 0.6949,
+        "ci_lo": 0.6323,
+        "ci_hi": 0.7515,
+        "half_width": 0.0596
       },
       "idiom-source": {
         "metric": "book_em",
@@ -424,57 +424,57 @@
         "metric": "exact_match",
         "n": 100,
         "mean": 0.63,
-        "ci_lo": 0.54,
+        "ci_lo": 0.53,
         "ci_hi": 0.72,
-        "half_width": 0.09
+        "half_width": 0.095
       },
       "compress": {
         "metric": "efficiency",
         "n": 100,
         "mean": 0.0939,
-        "ci_lo": 0.0837,
-        "ci_hi": 0.1054,
-        "half_width": 0.0108
+        "ci_lo": 0.0838,
+        "ci_hi": 0.1047,
+        "half_width": 0.0104
       },
       "_avg": {
-        "mean": 0.4136,
-        "ci_lo": 0.3868,
-        "ci_hi": 0.4404,
-        "half_width": 0.0268
+        "mean": 0.5819,
+        "ci_lo": 0.5527,
+        "ci_hi": 0.6093,
+        "half_width": 0.0283
       }
     },
     "minimax-m2.5": {
       "translate": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.2193,
-        "ci_lo": 0.1975,
-        "ci_hi": 0.2403,
-        "half_width": 0.0214
+        "mean": 0.704,
+        "ci_lo": 0.656,
+        "ci_hi": 0.75,
+        "half_width": 0.047
       },
       "punctuate": {
         "metric": "punct_f1",
         "n": 100,
         "mean": 0.7086,
-        "ci_lo": 0.6381,
-        "ci_hi": 0.7776,
-        "half_width": 0.0698
+        "ci_lo": 0.6404,
+        "ci_hi": 0.7765,
+        "half_width": 0.0681
       },
       "char-gloss": {
-        "metric": "chrf",
-        "n": 100,
-        "mean": 0.1614,
-        "ci_lo": 0.114,
-        "ci_hi": 0.2157,
-        "half_width": 0.0508
+        "metric": "judge_norm",
+        "n": 93,
+        "mean": 0.6538,
+        "ci_lo": 0.5935,
+        "ci_hi": 0.7075,
+        "half_width": 0.057
       },
       "idiom-source": {
         "metric": "book_em",
         "n": 100,
         "mean": 0.55,
-        "ci_lo": 0.45,
+        "ci_lo": 0.46,
         "ci_hi": 0.65,
-        "half_width": 0.1
+        "half_width": 0.095
       },
       "fill-in": {
         "metric": "exact_match",
@@ -489,48 +489,48 @@
         "n": 100,
         "mean": 0.0918,
         "ci_lo": 0.0833,
-        "ci_hi": 0.1007,
-        "half_width": 0.0087
+        "ci_hi": 0.1003,
+        "half_width": 0.0085
       },
       "_avg": {
-        "mean": 0.3868,
-        "ci_lo": 0.3599,
-        "ci_hi": 0.4144,
-        "half_width": 0.0272
+        "mean": 0.5497,
+        "ci_lo": 0.5206,
+        "ci_hi": 0.5783,
+        "half_width": 0.0289
       }
     },
     "qwen3-coder-next": {
       "translate": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.2269,
-        "ci_lo": 0.2003,
-        "ci_hi": 0.2553,
-        "half_width": 0.0275
+        "mean": 0.746,
+        "ci_lo": 0.698,
+        "ci_hi": 0.79,
+        "half_width": 0.046
       },
       "punctuate": {
         "metric": "punct_f1",
         "n": 100,
         "mean": 0.7669,
         "ci_lo": 0.7002,
-        "ci_hi": 0.8264,
+        "ci_hi": 0.8263,
         "half_width": 0.0631
       },
       "char-gloss": {
-        "metric": "chrf",
+        "metric": "judge_norm",
         "n": 100,
-        "mean": 0.1161,
-        "ci_lo": 0.0787,
-        "ci_hi": 0.1597,
-        "half_width": 0.0405
+        "mean": 0.602,
+        "ci_lo": 0.548,
+        "ci_hi": 0.658,
+        "half_width": 0.055
       },
       "idiom-source": {
         "metric": "book_em",
         "n": 100,
         "mean": 0.54,
         "ci_lo": 0.44,
-        "ci_hi": 0.63,
-        "half_width": 0.095
+        "ci_hi": 0.64,
+        "half_width": 0.1
       },
       "fill-in": {
         "metric": "exact_match",
@@ -545,14 +545,14 @@
         "n": 100,
         "mean": 0.113,
         "ci_lo": 0.1024,
-        "ci_hi": 0.1245,
-        "half_width": 0.0111
+        "ci_hi": 0.1243,
+        "half_width": 0.011
       },
       "_avg": {
-        "mean": 0.3805,
-        "ci_lo": 0.3556,
-        "ci_hi": 0.4083,
-        "half_width": 0.0264
+        "mean": 0.548,
+        "ci_lo": 0.5211,
+        "ci_hi": 0.5773,
+        "half_width": 0.0281
       }
     }
   }

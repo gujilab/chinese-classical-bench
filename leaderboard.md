@@ -1,34 +1,53 @@
-## Leaderboard (chrF-based, 95% CI from item bootstrap)
+## Leaderboard (primary, 95% CI from item bootstrap)
 
-| Model | translate (chrF) | punctuate (Punct F1) | char-gloss (chrF) | idiom-source (Book EM) | fill-in (Exact) | compress (Compress Eff) | Avg |
-|---|---|---|---|---|---|---|---|
-| claude-opus-4-7 | 0.244 ±0.026 | 0.800 ±0.063 | 0.213 ±0.056 | 0.650 ±0.095 | 0.860 ±0.070 | 0.147 ±0.034 | **0.485 ±0.025** |
-| claude-opus-4-7-thinking | 0.242 ±0.023 | 0.790 ±0.065 | 0.207 ±0.053 | 0.630 ±0.095 | 0.880 ±0.065 | 0.091 ±0.025 | **0.473 ±0.024** |
-| claude-sonnet-4-6 | 0.231 ±0.022 | 0.785 ±0.065 | 0.157 ±0.044 | 0.560 ±0.100 | 0.700 ±0.090 | 0.163 ±0.022 | **0.432 ±0.027** |
-| deepseek-3.2 | 0.240 ±0.025 | 0.745 ±0.069 | 0.139 ±0.046 | 0.740 ±0.085 | 0.550 ±0.095 | 0.163 ±0.019 | **0.429 ±0.027** |
-| glm-5 | 0.241 ±0.026 | 0.799 ±0.063 | 0.176 ±0.049 | 0.740 ±0.085 | 0.450 ±0.095 | 0.153 ±0.018 | **0.427 ±0.026** |
-| minimax-m2.1 | 0.216 ±0.023 | 0.709 ±0.070 | 0.173 ±0.049 | 0.660 ±0.090 | 0.630 ±0.090 | 0.094 ±0.011 | **0.414 ±0.027** |
-| Qwen3.5-35B-A3B | 0.225 ±0.023 | 0.753 ±0.062 | 0.175 ±0.053 | 0.500 ±0.100 | 0.380 ±0.090 | — | **0.407 ±0.032** |
-| minimax-m2.5 | 0.219 ±0.021 | 0.709 ±0.070 | 0.161 ±0.051 | 0.550 ±0.100 | 0.590 ±0.095 | 0.092 ±0.009 | **0.387 ±0.027** |
-| qwen3-coder-next | 0.227 ±0.028 | 0.767 ±0.063 | 0.116 ±0.041 | 0.540 ±0.095 | 0.520 ±0.095 | 0.113 ±0.011 | **0.381 ±0.026** |
-| claude-haiku-4-5-20251001 | 0.204 ±0.024 | 0.729 ±0.063 | 0.128 ±0.048 | 0.340 ±0.090 | 0.350 ±0.090 | 0.087 ±0.009 | **0.306 ±0.026** |
+`translate`/`char-gloss` headline = **Claude Opus 4.7 LLM judge** (0–1); chrF systematically under-rates synonymous paraphrase and is reported as a labelled floor in the transparency table below. `Preserve` = `punctuate` char-preservation rate (fraction of items where the model did not rewrite the text — a fidelity diagnostic `translate` cannot express; see `docs/task-redundancy.md`).
 
-## Judge-rescored ranking — translate & char-gloss
+| Model | translate (Judge) | punctuate (Punct F1) | char-gloss (Judge) | idiom-source (Book EM) | fill-in (Exact) | compress (Compress Eff) | Preserve | Avg |
+|---|---|---|---|---|---|---|---|---|
+| claude-opus-4-7 | 0.800 ±0.041 | 0.800 ±0.063 | 0.716 ±0.050 | 0.650 ±0.090 | 0.860 ±0.065 | 0.147 ±0.034 | 0.820 | **0.662 ±0.024** |
+| claude-opus-4-7-thinking | 0.802 ±0.043 | 0.790 ±0.065 | 0.736 ±0.044 | 0.630 ±0.095 | 0.880 ±0.065 | 0.091 ±0.026 | 0.820 | **0.655 ±0.025** |
+| claude-sonnet-4-6 | 0.776 ±0.047 | 0.785 ±0.063 | 0.694 ±0.049 | 0.560 ±0.100 | 0.700 ±0.090 | 0.163 ±0.022 | 0.740 | **0.613 ±0.027** |
+| Qwen3.5-35B-A3B | 0.728 ±0.048 | 0.753 ±0.062 | 0.620 ±0.052 | 0.500 ±0.100 | 0.380 ±0.090 | — | 0.690 | **0.596 ±0.032 ⚠** |
+| glm-5 | 0.748 ±0.045 | 0.799 ±0.063 | 0.638 ±0.055 | 0.740 ±0.085 | 0.450 ±0.100 | 0.153 ±0.018 | 0.790 | **0.588 ±0.026** |
+| minimax-m2.1 | 0.704 ±0.052 | 0.709 ±0.072 | 0.695 ±0.060 | 0.660 ±0.090 | 0.630 ±0.095 | 0.094 ±0.010 | 0.620 | **0.582 ±0.028** |
+| deepseek-3.2 | 0.754 ±0.045 | 0.745 ±0.071 | 0.538 ±0.060 | 0.740 ±0.085 | 0.550 ±0.095 | 0.163 ±0.019 | 0.770 | **0.582 ±0.029** |
+| minimax-m2.5 | 0.704 ±0.047 | 0.709 ±0.068 | 0.654 ±0.057 | 0.550 ±0.095 | 0.590 ±0.095 | 0.092 ±0.009 | 0.620 | **0.550 ±0.029** |
+| qwen3-coder-next | 0.746 ±0.046 | 0.767 ±0.063 | 0.602 ±0.055 | 0.540 ±0.100 | 0.520 ±0.095 | 0.113 ±0.011 | 0.660 | **0.548 ±0.028** |
+| claude-haiku-4-5-20251001 | 0.675 ±0.049 | 0.729 ±0.062 | 0.578 ±0.058 | 0.340 ±0.090 | 0.350 ±0.090 | 0.087 ±0.009 | 0.720 | **0.460 ±0.028** |
 
-Claude Opus 4.7 and Claude Sonnet 4.6 both used as judges, 0-5 ordinal rubric, normalized to 0-1. chrF rewards literal n-gram overlap and systematically under-rates synonymous paraphrase; the LLM judge sees meaning. Two-judge cross-validation substitutes for human gold labels — where Opus and Sonnet agree, the rating is trustworthy. See [`experiments/llm-judge/report.md`](experiments/llm-judge/report.md) for correlation analysis and [`experiments/llm-judge/agreement.json`](experiments/llm-judge/agreement.json) for inter-judge kappa.
+⚠ Avg is the mean of *available* task headlines — not strictly comparable for: `Qwen3.5-35B-A3B` missing compress. Excluding a low-scoring task (e.g. `compress`) inflates that model's Avg.
 
-| Model | translate (chrF) | translate (Opus) | translate (Sonnet) | char-gloss (chrF) | char-gloss (Opus) | char-gloss (Sonnet) |
+## Canonicity-stratified — recall vs. competence
+
+Avg restricted to items whose source is core canon (**T3**: 论语/史记/诗经 … memorized verbatim by every LLM), well-known (**T2**), or obscure (**T1**: minor dynastic histories / specialized 子). **Gap = T3 − T1** is the recall-reliance signal: a large positive gap means the model leans on having seen the famous text. Ranked by **T1** — the contamination-robust ranking. Point estimates (no CI); tier definitions in `scripts/canonicity.py`. `idiom-source` ρ=0.68 dominates this effect (`docs/contamination.md`).
+
+| Model | T3 canon | T2 | T1 obscure | Gap (T3−T1) |
+|---|---|---|---|---|
+| Qwen3.5-35B-A3B | 0.656 | 0.393 | 0.546 | +0.110 |
+| glm-5 | 0.633 | 0.426 | 0.514 | +0.119 |
+| claude-opus-4-7 | 0.732 | 0.607 | 0.512 | +0.220 |
+| claude-sonnet-4-6 | 0.663 | 0.579 | 0.507 | +0.155 |
+| claude-opus-4-7-thinking | 0.696 | 0.598 | 0.507 | +0.188 |
+| deepseek-3.2 | 0.643 | 0.435 | 0.491 | +0.151 |
+| minimax-m2.1 | 0.616 | 0.370 | 0.466 | +0.150 |
+| qwen3-coder-next | 0.599 | 0.561 | 0.455 | +0.144 |
+| minimax-m2.5 | 0.566 | 0.364 | 0.445 | +0.121 |
+| claude-haiku-4-5-20251001 | 0.461 | 0.304 | 0.434 | +0.027 |
+
+## Transparency — chrF floor & two-judge cross-check (translate / char-gloss)
+
+The judge headline above is **Opus**. Here it is shown next to the reproducible **chrF** floor and the independent **Sonnet** judge. Opus and Sonnet agreeing (and both far above chrF) is the evidence that the judge promotion is sound, not cherry-picked. See `experiments/llm-judge/`.
+
+| Model | translate chrF | translate Opus | translate Sonnet | char-gloss chrF | char-gloss Opus | char-gloss Sonnet |
 |---|---|---|---|---|---|---|
-| claude-opus-4-7-thinking | 0.242 | 0.802 | 0.770 | 0.207 | 0.736 | 0.706 |
 | claude-opus-4-7 | 0.244 | 0.800 | 0.780 | 0.213 | 0.716 | 0.700 |
+| claude-opus-4-7-thinking | 0.242 | 0.802 | 0.770 | 0.207 | 0.736 | 0.706 |
 | claude-sonnet-4-6 | 0.231 | 0.776 | 0.756 | 0.157 | 0.694 | 0.700 |
-| minimax-m2.1 | 0.216 | 0.704 | 0.708 | 0.173 | 0.695 | 0.685 |
-| glm-5 | 0.241 | 0.748 | 0.750 | 0.176 | 0.638 | 0.644 |
-| minimax-m2.5 | 0.219 | 0.704 | 0.688 | 0.161 | 0.654 | 0.662 |
 | Qwen3.5-35B-A3B | 0.225 | 0.728 | 0.732 | 0.175 | 0.620 | 0.630 |
-| qwen3-coder-next | 0.227 | 0.746 | 0.746 | 0.116 | 0.602 | 0.592 |
+| glm-5 | 0.241 | 0.748 | 0.750 | 0.176 | 0.638 | 0.644 |
+| minimax-m2.1 | 0.216 | 0.704 | 0.708 | 0.173 | 0.695 | 0.685 |
 | deepseek-3.2 | 0.240 | 0.754 | 0.738 | 0.139 | 0.538 | 0.554 |
+| minimax-m2.5 | 0.219 | 0.704 | 0.688 | 0.161 | 0.654 | 0.662 |
+| qwen3-coder-next | 0.227 | 0.746 | 0.746 | 0.116 | 0.602 | 0.592 |
 | claude-haiku-4-5-20251001 | 0.204 | 0.675 | 0.682 | 0.128 | 0.578 | 0.574 |
-
-*Opus judge complete on 10/10 models, Sonnet judge complete on 10/10 models × 100 questions per task. `*` = partial (run in progress).*
 

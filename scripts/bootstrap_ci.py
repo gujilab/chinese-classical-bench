@@ -22,10 +22,14 @@ REPO = Path(__file__).resolve().parents[1]
 RESULTS = REPO / "results"
 OUT = RESULTS / "_bootstrap.json"
 
+# PRIMARY metric per task. translate/char-gloss use the LLM judge
+# (judge_norm, Opus 0-1) — chrF systematically under-rates synonymous
+# paraphrase (see findings.md §2 / experiments/llm-judge). chrF is kept as a
+# labelled reproducible floor in aggregate.py, not as the headline.
 HEADLINE = {
-    "translate":     "chrf",
+    "translate":     "judge_norm",
     "punctuate":     "punct_f1",
-    "char-gloss":    "chrf",
+    "char-gloss":    "judge_norm",
     "idiom-source":  "book_em",
     "fill-in":       "exact_match",
     "compress":      "efficiency",

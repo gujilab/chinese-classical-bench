@@ -2,8 +2,15 @@
 
 Reads results/*.json (per-item predictions + scores) and results/_bootstrap.json
 (precomputed 95% CIs) and renders:
-  1. Headline leaderboard — chrF / Punct F1 / Book EM / etc. with ±CI
-  2. Judge-rescored ranking for translate + char-gloss (Claude Opus 4.7 judge)
+  1. Primary leaderboard — PRIMARY metric per task ±CI. translate/char-gloss
+     use the LLM judge (chrF under-rates paraphrase, findings.md §2);
+     punctuate also shows char_preserved (the additive fidelity diagnostic,
+     task-redundancy.md §7).
+  2. Canonicity-stratified — Avg on core-canon (T3) vs obscure (T1) sources
+     + recall gap, sorted by the contamination-robust T1 ranking
+     (contamination.md / findings.md §6).
+  3. Transparency — chrF reproducible floor + two-judge cross-check for
+     translate/char-gloss (shows the judge headline is not cherry-picked).
 
 Usage:
   python scripts/aggregate.py                  # print to stdout
@@ -12,23 +19,26 @@ Usage:
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 RESULTS = REPO / "results"
 BOOTSTRAP = RESULTS / "_bootstrap.json"
+sys.path.insert(0, str(REPO / "scripts"))
+from canonicity import id_to_tier  # noqa: E402
 
-# headline metric per task
+# PRIMARY metric per task (translate/char-gloss promoted to LLM judge).
 HEADLINE = {
-    "translate":     ("chrf",        "chrF"),
+    "translate":     ("judge_norm",  "Judge"),
     "punctuate":     ("punct_f1",    "Punct F1"),
-    "char-gloss":    ("chrf",        "chrF"),
+    "char-gloss":    ("judge_norm",  "Judge"),
     "idiom-source":  ("book_em",     "Book EM"),
     "fill-in":       ("exact_match", "Exact"),
     "compress":      ("efficiency",  "Compress Eff"),
 }
 TASK_ORDER = list(HEADLINE.keys())
-JUDGE_TASKS = ["translate", "char-gloss"]  # tasks where LLM judge applies
+JUDGE_TASKS = ["translate", "char-gloss"]
 
 
 def load_bootstrap() -> dict:
@@ -58,6 +68,7 @@ def main() -> None:
         return
 
     bootstrap = load_bootstrap()
+    tiers = id_to_tier(REPO / "data")
 
     rows = []
     for fp in files:
@@ -75,99 +86,133 @@ def main() -> None:
             summ = tr.get("summary", {})
             row[t] = summ.get(metric_key)
             row[f"{t}_ci"] = boot.get(t)
-            # judge fields (only present after backfill_judge.py)
-            row[f"{t}_judge"] = summ.get("judge_norm")
-            row[f"{t}_judge_n"] = summ.get("judge_n")
+            row[f"{t}_chrf"] = summ.get("chrf")          # floor for judge tasks
             row[f"{t}_judge_sonnet"] = summ.get("judge_sonnet_norm")
-            row[f"{t}_judge_sonnet_n"] = summ.get("judge_sonnet_n")
+        row["char_preserved"] = (
+            d.get("tasks", {}).get("punctuate", {})
+            .get("summary", {}).get("char_preserved"))
+        row["_missing"] = [t for t in TASK_ORDER if row[t] is None]
         row["_avg"] = (boot.get("_avg") or {}).get("mean")
         if row["_avg"] is None:
-            # fallback to local mean if bootstrap missing
             vals = [row[t] for t in TASK_ORDER if row[t] is not None]
             row["_avg"] = round(sum(vals) / len(vals), 4) if vals else None
         row["_avg_ci"] = boot.get("_avg")
+
+        # canonicity-stratified avg: per task, mean PRIMARY over items of
+        # tier k, then mean across tasks (same shape as the headline Avg).
+        by_tier: dict[int, list[float]] = {1: [], 2: [], 3: []}
+        for t in TASK_ORDER:
+            mk = HEADLINE[t][0]
+            buckets: dict[int, list[float]] = {1: [], 2: [], 3: []}
+            for it in d.get("tasks", {}).get(t, {}).get("items", []):
+                tk = tiers.get(it["id"])
+                v = (it.get("scores") or {}).get(mk)
+                if tk in buckets and isinstance(v, (int, float)):
+                    buckets[tk].append(float(v))
+            for k in (1, 2, 3):
+                if buckets[k]:
+                    by_tier[k].append(sum(buckets[k]) / len(buckets[k]))
+        for k in (1, 2, 3):
+            row[f"_t{k}"] = (round(sum(by_tier[k]) / len(by_tier[k]), 4)
+                             if by_tier[k] else None)
         rows.append(row)
 
     rows.sort(key=lambda r: -(r["_avg"] or 0))
-
     lines: list[str] = []
 
-    # ----- Headline leaderboard (chrF for translate/char-gloss) -----
-    lines.append("## Leaderboard (chrF-based, 95% CI from item bootstrap)")
+    # ---- 1. Primary leaderboard --------------------------------------------
+    lines.append("## Leaderboard (primary, 95% CI from item bootstrap)")
     lines.append("")
-    headers = ["Model"] + [f"{t} ({HEADLINE[t][1]})" for t in TASK_ORDER] + ["Avg"]
+    lines.append("`translate`/`char-gloss` headline = **Claude Opus 4.7 LLM "
+                 "judge** (0–1); chrF systematically under-rates synonymous "
+                 "paraphrase and is reported as a labelled floor in the "
+                 "transparency table below. `Preserve` = `punctuate` "
+                 "char-preservation rate (fraction of items where the model "
+                 "did not rewrite the text — a fidelity diagnostic "
+                 "`translate` cannot express; see `docs/task-redundancy.md`).")
+    lines.append("")
+    headers = ["Model"] + [f"{t} ({HEADLINE[t][1]})" for t in TASK_ORDER] + \
+              ["Preserve", "Avg"]
     lines.append("| " + " | ".join(headers) + " |")
     lines.append("|" + "|".join(["---"] * len(headers)) + "|")
     for r in rows:
         cells = [r["model"]]
         for t in TASK_ORDER:
             cells.append(fmt_with_ci(r[t], r[f"{t}_ci"]))
+        cp = r["char_preserved"]
+        cells.append(f"{cp:.3f}" if cp is not None else "—")
         avg_str = fmt_with_ci(r["_avg"], r["_avg_ci"])
-        cells.append(f"**{avg_str}**" if r["_avg"] is not None else "—")
+        mark = " ⚠" if r["_missing"] else ""
+        cells.append(f"**{avg_str}{mark}**" if r["_avg"] is not None else "—")
         lines.append("| " + " | ".join(cells) + " |")
     lines.append("")
+    incomplete = [(r["model"], r["_missing"]) for r in rows if r["_missing"]]
+    if incomplete:
+        note = "; ".join(f"`{m}` missing {','.join(ts)}"
+                         for m, ts in incomplete)
+        lines.append(f"⚠ Avg is the mean of *available* task headlines — "
+                     f"not strictly comparable for: {note}. Excluding a "
+                     f"low-scoring task (e.g. `compress`) inflates that "
+                     f"model's Avg.")
+        lines.append("")
 
-    # ----- Judge-rescored ranking for translate + char-gloss -----
-    judge_rows = [r for r in rows if any(r.get(f"{t}_judge") is not None for t in JUDGE_TASKS)]
-    if judge_rows:
-        lines.append("## Judge-rescored ranking — translate & char-gloss")
-        lines.append("")
-        lines.append("Claude Opus 4.7 and Claude Sonnet 4.6 both used as judges, 0-5 ordinal "
-                     "rubric, normalized to 0-1. chrF rewards literal n-gram overlap and "
-                     "systematically under-rates synonymous paraphrase; the LLM judge sees "
-                     "meaning. Two-judge cross-validation substitutes for human gold labels — "
-                     "where Opus and Sonnet agree, the rating is trustworthy. "
-                     "See [`experiments/llm-judge/report.md`](experiments/llm-judge/report.md) "
-                     "for correlation analysis and "
-                     "[`experiments/llm-judge/agreement.json`](experiments/llm-judge/agreement.json) "
-                     "for inter-judge kappa.")
-        lines.append("")
-        judge_headers = ["Model",
-                         "translate (chrF)", "translate (Opus)", "translate (Sonnet)",
-                         "char-gloss (chrF)", "char-gloss (Opus)", "char-gloss (Sonnet)"]
-        lines.append("| " + " | ".join(judge_headers) + " |")
-        lines.append("|" + "|".join(["---"] * len(judge_headers)) + "|")
+    # ---- 2. Canonicity-stratified ------------------------------------------
+    lines.append("## Canonicity-stratified — recall vs. competence")
+    lines.append("")
+    lines.append("Avg restricted to items whose source is core canon "
+                 "(**T3**: 论语/史记/诗经 … memorized verbatim by every LLM), "
+                 "well-known (**T2**), or obscure (**T1**: minor dynastic "
+                 "histories / specialized 子). **Gap = T3 − T1** is the "
+                 "recall-reliance signal: a large positive gap means the "
+                 "model leans on having seen the famous text. Ranked by "
+                 "**T1** — the contamination-robust ranking. Point estimates "
+                 "(no CI); tier definitions in `scripts/canonicity.py`. "
+                 "`idiom-source` ρ=0.68 dominates this effect "
+                 "(`docs/contamination.md`).")
+    lines.append("")
+    ch = ["Model", "T3 canon", "T2", "T1 obscure", "Gap (T3−T1)"]
+    lines.append("| " + " | ".join(ch) + " |")
+    lines.append("|" + "|".join(["---"] * len(ch)) + "|")
+    for r in sorted(rows, key=lambda r: -(r["_t1"] if r["_t1"] is not None
+                                          else -1)):
+        t1, t2, t3 = r["_t1"], r["_t2"], r["_t3"]
+        gap = (f"{t3 - t1:+.3f}" if (t3 is not None and t1 is not None)
+               else "—")
+        lines.append("| " + " | ".join([
+            r["model"],
+            f"{t3:.3f}" if t3 is not None else "—",
+            f"{t2:.3f}" if t2 is not None else "—",
+            f"{t1:.3f}" if t1 is not None else "—",
+            gap]) + " |")
+    lines.append("")
 
-        # sort by mean Opus judge across two tasks (only count complete tasks);
-        # partial rows (n<100) sink to bottom for ranking purposes
-        def judge_avg(r: dict) -> float:
-            js = [r[f"{t}_judge"] for t in JUDGE_TASKS
-                  if r.get(f"{t}_judge") is not None
-                  and (r.get(f"{t}_judge_n") or 0) >= 90]
-            return sum(js) / len(js) if js else -1.0
-        judge_rows.sort(key=lambda r: -judge_avg(r))
-
-        for r in judge_rows:
-            cells = [r["model"]]
-            for t in JUDGE_TASKS:
-                chrf = r[t]
-                cells.append(f"{chrf:.3f}" if chrf is not None else "—")
-                jo = r.get(f"{t}_judge")
-                jon = r.get(f"{t}_judge_n") or 0
-                if jo is not None and jon >= 90:
-                    cells.append(f"{jo:.3f}")
-                elif jo is not None:
-                    cells.append(f"{jo:.3f}*")
-                else:
-                    cells.append("—")
-                js_ = r.get(f"{t}_judge_sonnet")
-                jsn = r.get(f"{t}_judge_sonnet_n") or 0
-                if js_ is not None and jsn >= 90:
-                    cells.append(f"{js_:.3f}")
-                elif js_ is not None:
-                    cells.append(f"{js_:.3f}*")  # partial
-                else:
-                    cells.append("—")
-            lines.append("| " + " | ".join(cells) + " |")
-        lines.append("")
-        n_opus = sum(1 for r in judge_rows
-                     if all((r.get(f"{t}_judge_n") or 0) >= 90 for t in JUDGE_TASKS))
-        n_sonnet = sum(1 for r in judge_rows
-                       if all((r.get(f"{t}_judge_sonnet_n") or 0) >= 90 for t in JUDGE_TASKS))
-        lines.append(f"*Opus judge complete on {n_opus}/{len(rows)} models, "
-                     f"Sonnet judge complete on {n_sonnet}/{len(rows)} models "
-                     f"× 100 questions per task. `*` = partial (run in progress).*")
-        lines.append("")
+    # ---- 3. Transparency: chrF floor + two-judge cross-check ---------------
+    lines.append("## Transparency — chrF floor & two-judge cross-check "
+                 "(translate / char-gloss)")
+    lines.append("")
+    lines.append("The judge headline above is **Opus**. Here it is shown "
+                 "next to the reproducible **chrF** floor and the "
+                 "independent **Sonnet** judge. Opus and Sonnet agreeing "
+                 "(and both far above chrF) is the evidence that the judge "
+                 "promotion is sound, not cherry-picked. See "
+                 "`experiments/llm-judge/`.")
+    lines.append("")
+    th = ["Model",
+          "translate chrF", "translate Opus", "translate Sonnet",
+          "char-gloss chrF", "char-gloss Opus", "char-gloss Sonnet"]
+    lines.append("| " + " | ".join(th) + " |")
+    lines.append("|" + "|".join(["---"] * len(th)) + "|")
+    for r in sorted(rows, key=lambda r: -(r["_avg"] or 0)):
+        cells = [r["model"]]
+        for t in JUDGE_TASKS:
+            f = r.get(f"{t}_chrf")
+            o = r.get(t)                       # PRIMARY = Opus judge_norm
+            s = r.get(f"{t}_judge_sonnet")
+            cells += [f"{f:.3f}" if f is not None else "—",
+                      f"{o:.3f}" if o is not None else "—",
+                      f"{s:.3f}" if s is not None else "—"]
+        lines.append("| " + " | ".join(cells) + " |")
+    lines.append("")
 
     md = "\n".join(lines)
     print(md)

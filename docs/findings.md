@@ -157,14 +157,26 @@ Priority order, now that the follow-ups have run:
    tests, so these are explicitly *not* drop-in — they need human/judge
    review **and** a scoped rerun (cost), since replacing items invalidates
    stored predictions. Until then the `_audit_issue` filter is the fix.
-3. **Report a canonicity-stratified leaderboard** (Tier-1/2/3 columns). Cheap,
-   no rerun, and directly exposes which models rely on recall.
-4. **Promote the judge-rescored table** to the primary leaderboard for
-   `translate`/`char-gloss`; keep chrF as a labelled secondary floor.
-5. **Surface `char_preserved`** as a labelled `punctuate` column — it is the
-   genuinely additive part of that task (§7). Keep both `punctuate` and
-   `translate`; the redundancy question is resolved (not redundant).
+3. ~~**Report a canonicity-stratified leaderboard**~~ **DONE**. `leaderboard.md`
+   now has a T3/T2/T1 + recall-gap section ranked by the obscure-source (T1)
+   column. New result: the recall gap (T3−T1) reorders the board —
+   `claude-opus-4-7` has the **largest** gap (+0.220) and drops from #1
+   overall to #3 on obscure sources; `Qwen3.5`/`glm-5` lead the
+   contamination-robust ranking. Recall reliance is itself model-
+   discriminating.
+4. ~~**Promote the judge-rescored table to primary**~~ **DONE**. `translate`/
+   `char-gloss` headline is now the Opus judge with judge-aware bootstrap
+   CIs; chrF is a labelled reproducible floor in a transparency table beside
+   the independent Sonnet judge (the two judges agree within ~0.02 and sit
+   ~0.5 above chrF — the promotion is not cherry-picked).
+5. ~~**Surface `char_preserved`**~~ **DONE**. Added as a labelled `Preserve`
+   column. Both `punctuate` and `translate` kept (redundancy resolved, §7).
 
-Net: of the cheap/free wins, items 3–5 are doable now without a rerun;
-items 1–2 are correctly *blocked on either funding or source recovery*, and
-saying so plainly is more useful than shipping fabricated replacements.
+Net: items 3–5 shipped (free, no rerun); items 1–2 remain correctly
+*blocked on funding or source recovery* — saying so plainly beats shipping
+fabricated replacements. Also fixed in passing: Avg now flags models with
+missing tasks (`Qwen3.5` lacks `compress`, which inflated its Avg).
+
+A residual methodology note worth a future pass: the `Avg` still averages
+*available* task headlines, so an incomplete model is not strictly
+comparable — a stricter leaderboard would require all 6 tasks or impute.

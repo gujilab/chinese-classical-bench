@@ -26,10 +26,13 @@ Usage:
   python scripts/contamination_probe.py [--out docs/contamination.md]
 """
 from __future__ import annotations
-import argparse, json, math, re
+import argparse, json, math, re, sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "scripts"))
+from canonicity import tier  # noqa: E402  (shared source of truth)
+
 CORPUS = Path.home() / "Documents/zion/classical-corpus/output/corpus.jsonl"
 TASK_FILES = {
     "translate": "translate.jsonl", "punctuate": "punctuate.jsonl",
@@ -38,20 +41,6 @@ TASK_FILES = {
     "compress": "compress.jsonl",
 }
 PUNCT = re.compile(r"[，。、；：！？「」『』《》（）()【】\s“”‘’,.;:!?\"'\-—…]")
-
-# Tier 3 = core canon: memorized verbatim by essentially every LLM
-#          (Four Books + the most-anthologized classics + 史记)
-# Tier 2 = well-known classics/histories, quoted but less verbatim
-# Tier 1 = everything else (obscure dynastic histories, specialized 子)
-TIER3 = {"论语", "孟子", "大学", "中庸", "诗经", "周易", "尚书", "礼记",
-         "左传", "老子", "庄子", "孙子兵法", "史记"}
-TIER2 = {"汉书", "后汉书", "三国志", "资治通鉴", "韩非子", "荀子",
-         "战国策", "国语", "墨子", "孝经", "尔雅", "仪礼", "周礼",
-         "吕氏春秋", "淮南子", "列子", "公羊传", "穀梁传", "晋书"}
-
-
-def tier(book: str) -> int:
-    return 3 if book in TIER3 else 2 if book in TIER2 else 1
 
 
 def spearman(xs, ys):
