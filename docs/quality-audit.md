@@ -51,9 +51,13 @@ harder *replacement* items, not relabeling. Tracked as a v1.x task.
   `scripts/regen_char_gloss_candidates.py`. **Not adopted** — 说文 gives 本义
   ≠ contextual sense; needs human/judge review + a scoped rerun. The
   original modern-gloss dictionary is gone.
-- *idiom-source ceiling fix*: **blocked** — source `idiom.json` deleted;
-  deterministic regen with verifiable 出处 impossible without it. Will not
-  fabricate gold.
+- *idiom-source ceiling fix*: ~~blocked~~ **staged**. Source recovered from
+  public CC0 `pwxcoo/chinese-xinhua` (pinned commit+sha256,
+  `scripts/fetch_idiom_source_data.py`). `scripts/build_idiom_source_v2.py`
+  → `data/idiom_source.v2.jsonl`: 100 Tier-1-only items (tier mix {1:100},
+  contamination ρ≈0 by construction), 11 obscure books, 0 overlap with v1,
+  gold = verbatim derivation citation. Not adopted in place (needs a scoped
+  idiom-source rerun); v1 stays canonical until then.
 
 Total flagged after this pass: **31 records** (18 new char-gloss circular +
 2 new disputed + 11 from the 2026-05-13 pass below).

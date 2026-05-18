@@ -13,3 +13,4 @@ kiro_stats.json
 # experiment data files (commit scripts, not data)
 experiments/*/*.jsonl
 experiments/*/.cache/
+data/_vendor/

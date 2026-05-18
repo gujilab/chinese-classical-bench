@@ -143,14 +143,22 @@ inputs on `punctuate` (a fidelity failure `translate` can't surface);
 Priority order, now that the follow-ups have run:
 
 1. **`idiom-source` is the worst task and for two compounding reasons** — 23
-   ceiling items (§5) *and* ρ=0.68 contamination (§6), which are the same
-   problem: it samples famous canon. Rebuild it from Tier-1 (obscure-source)
-   allusions. **Status: blocked** — the source idiom dictionary
-   (`idiom.json`) was deleted; deterministic regeneration with verifiable
-   出处 is not possible without it. Options: re-acquire the dictionary, or
-   hand-curate from Tier-1 corpus books (not free, not deterministic). Do
-   **not** fabricate gold — that is the failure mode this whole audit exists
-   to catch.
+   ceiling items (§5) *and* ρ=0.68 contamination (§6), the same problem: it
+   samples famous canon. ~~Status: blocked (source deleted)~~ **UNBLOCKED &
+   STAGED.** The deleted dictionary has a public CC0 equivalent
+   (`pwxcoo/chinese-xinhua` `idiom.json`, pinned by commit + sha256 in
+   `scripts/fetch_idiom_source_data.py`). `scripts/build_idiom_source_v2.py`
+   parses each idiom's `derivation` (出处) for book + quote and resamples a
+   full **100-item Tier-1-only** set → `data/idiom_source.v2.jsonl`.
+   Result: tier mix `{1: 100}` (contamination ρ≈0 *by construction* — every
+   source is an obscure dynastic history or 说文, none core canon), balanced
+   across 11 books, **0 idiom overlap** with v1, gold = the verbatim
+   derivation citation (verifiable, not a mechanical guess — far higher
+   confidence than the char-gloss candidates). **Not yet adopted**: swapping
+   the item set invalidates the stored predictions, so it needs a scoped
+   `idiom-source` rerun (cost) — but the deterministic, auditable generation
+   half is done and the recall-vs-competence flaw is structurally fixed in
+   the staged set.
 2. **`char-gloss` 18 circular-gold items**: candidates staged at
    `data/char_gloss.candidates.jsonl` (10 mechanical 说文 candidates, 8
    blocked). 说文 gives the 本义, which often ≠ the contextual sense the task
