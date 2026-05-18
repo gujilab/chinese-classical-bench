@@ -159,12 +159,16 @@ Priority order, now that the follow-ups have run:
    `idiom-source` rerun (cost) — but the deterministic, auditable generation
    half is done and the recall-vs-competence flaw is structurally fixed in
    the staged set.
-2. **`char-gloss` 18 circular-gold items**: candidates staged at
-   `data/char_gloss.candidates.jsonl` (10 mechanical 说文 candidates, 8
-   blocked). 说文 gives the 本义, which often ≠ the contextual sense the task
-   tests, so these are explicitly *not* drop-in — they need human/judge
-   review **and** a scoped rerun (cost), since replacing items invalidates
-   stored predictions. Until then the `_audit_issue` filter is the fix.
+2. **`char-gloss` 18 circular-gold items**: ~~10 mechanical 说文 + 8
+   blocked~~ **UPGRADED to 18/18 verified.** The same CC0 source
+   (`chinese-xinhua/word.json`, pinned) states each char's 本义 in a
+   parenthetical — which is exactly what the stub "同本义" pointed at, in
+   modern Chinese matching the task's answer style (e.g. 罗→用绳线结成的捕鸟网,
+   僮→未成年的人, 捎→选取). `data/char_gloss.candidates.jsonl` now has 18/18
+   `_status: candidate-verified`, 0 blocked (说文 kept only as a low-
+   confidence fallback). Still **not adopted**: a few are 本义 vs the quote's
+   contextual sense, so they want a judge pass, and swapping items needs a
+   scoped char-gloss rerun. Until then the `_audit_issue` filter is the fix.
 3. ~~**Report a canonicity-stratified leaderboard**~~ **DONE**. `leaderboard.md`
    now has a T3/T2/T1 + recall-gap section ranked by the obscure-source (T1)
    column. New result: the recall gap (T3−T1) reorders the board —

@@ -46,11 +46,13 @@ harder *replacement* items, not relabeling. Tracked as a v1.x task.
 - *Redundancy* ([`task-redundancy.md`](task-redundancy.md)): `punctuate`↔
   `translate` ρ=0.88 is an n=10 ability artifact, not redundancy — hardest
   material is disjoint (punctuate 93% 史, translate 0% 史). Keep both.
-- *char-gloss regeneration*: `data/char_gloss.candidates.jsonl` stages 10
-  mechanical 说文-derived candidates + 8 blocked, via
-  `scripts/regen_char_gloss_candidates.py`. **Not adopted** — 说文 gives 本义
-  ≠ contextual sense; needs human/judge review + a scoped rerun. The
-  original modern-gloss dictionary is gone.
+- *char-gloss regeneration*: `data/char_gloss.candidates.jsonl` now stages
+  **18/18 verified** glosses (was 10 mechanical 说文 + 8 blocked). Source:
+  `chinese-xinhua/word.json` (pinned), whose `explanation` states each
+  char's 本义 — exactly what the "同本义" stub referenced, in modern Chinese.
+  说文 retained only as low-confidence fallback. **Not adopted** — a few are
+  本义 vs the quote's contextual sense (want a judge pass) and swapping
+  items needs a scoped char-gloss rerun.
 - *idiom-source ceiling fix*: ~~blocked~~ **staged**. Source recovered from
   public CC0 `pwxcoo/chinese-xinhua` (pinned commit+sha256,
   `scripts/fetch_idiom_source_data.py`). `scripts/build_idiom_source_v2.py`
