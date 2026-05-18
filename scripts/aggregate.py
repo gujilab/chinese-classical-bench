@@ -118,6 +118,29 @@ def main() -> None:
         rows.append(row)
 
     rows.sort(key=lambda r: -(r["_avg"] or 0))
+
+    # Significance tiers: walking down by mean, a model stays in the current
+    # tier while its 95% Avg CI still overlaps the tier *leader*'s CI
+    # (leader = highest-mean member). It starts a new, lower tier only when
+    # its CI upper bound falls below the leader's CI lower bound — i.e. it is
+    # statistically distinguishable from the tier leader. Models sharing a
+    # letter are not significantly different at 95%.
+    tier_letter, leader_lo = "A", None
+    for r in rows:
+        ci = r.get("_avg_ci") or {}
+        lo, hi = ci.get("ci_lo"), ci.get("ci_hi")
+        if leader_lo is None:
+            r["_sig"] = tier_letter
+            leader_lo = lo
+        elif lo is None or hi is None:
+            r["_sig"] = "—"
+        elif hi < leader_lo:                       # clearly worse than leader
+            tier_letter = chr(ord(tier_letter) + 1)
+            r["_sig"] = tier_letter
+            leader_lo = lo
+        else:
+            r["_sig"] = tier_letter
+
     lines: list[str] = []
 
     # ---- 1. Primary leaderboard --------------------------------------------
@@ -131,12 +154,18 @@ def main() -> None:
                  "did not rewrite the text — a fidelity diagnostic "
                  "`translate` cannot express; see `docs/task-redundancy.md`).")
     lines.append("")
-    headers = ["Model"] + [f"{t} ({HEADLINE[t][1]})" for t in TASK_ORDER] + \
+    lines.append("`Tier` = statistical significance band: models sharing a "
+                 "letter have **overlapping 95% Avg CIs** (not significantly "
+                 "different); a lower letter is significantly worse than its "
+                 "tier leader. Treat within-tier order as noise.")
+    lines.append("")
+    headers = ["Tier", "Model"] + \
+              [f"{t} ({HEADLINE[t][1]})" for t in TASK_ORDER] + \
               ["Preserve", "Avg"]
     lines.append("| " + " | ".join(headers) + " |")
     lines.append("|" + "|".join(["---"] * len(headers)) + "|")
     for r in rows:
-        cells = [r["model"]]
+        cells = [r.get("_sig", "—"), r["model"]]
         for t in TASK_ORDER:
             cells.append(fmt_with_ci(r[t], r[f"{t}_ci"]))
         cp = r["char_preserved"]

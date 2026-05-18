@@ -184,11 +184,20 @@ Priority order, now that the follow-ups have run:
 5. ~~**Surface `char_preserved`**~~ **DONE**. Added as a labelled `Preserve`
    column. Both `punctuate` and `translate` kept (redundancy resolved, §7).
 
-Net: items 3–5 shipped (free, no rerun); items 1–2 remain correctly
-*blocked on funding or source recovery* — saying so plainly beats shipping
-fabricated replacements. Also fixed in passing: Avg now flags models with
-missing tasks (`Qwen3.5` lacks `compress`, which inflated its Avg).
+Net: items 3–5 shipped (free, no rerun); items 1–2 **unblocked & staged**
+(CC0 sources recovered; deterministic, verifiable v2 sets built — adoption
+gated only on a scoped rerun, no fabricated gold). Also shipped free:
+- **Significance tiers** on the leaderboard — models with overlapping 95%
+  Avg CIs share a letter. Result: the top three (`opus-4-7`,
+  `opus-4-7-thinking`, `sonnet-4-6`) are **Tier A, statistically tied** — the
+  1-2-3 order is noise; a six-model **Tier B** middle; `haiku` alone in
+  **Tier C**. This stops over-reading rank.
+- **HF Space synced** — it now renders the repo's `leaderboard.md` verbatim
+  (judge-primary, 6 tasks, canonicity + transparency), so the public board
+  can't silently diverge from the repo again.
 
 A residual methodology note worth a future pass: the `Avg` still averages
 *available* task headlines, so an incomplete model is not strictly
-comparable — a stricter leaderboard would require all 6 tasks or impute.
+comparable — `Qwen3.5` (missing `compress`) is flagged ⚠ and is awkwardly
+the Tier-B leader for that reason. A stricter leaderboard would require all
+6 tasks or impute.
