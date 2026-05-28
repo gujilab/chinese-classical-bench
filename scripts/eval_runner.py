@@ -38,6 +38,14 @@ TASK_FILES = {
     "idiom-source": "idiom_source.jsonl",
     "fill-in": "fill_in.jsonl",
     "compress": "compress.jsonl",
+    "collation": "collation.jsonl",
+}
+
+EXT_FILES = {
+    "translate": "translate.ext.jsonl",
+    "punctuate": "punctuate.ext.jsonl",
+    "fill-in": "fill_in.ext.jsonl",
+    "compress": "compress.ext.jsonl",
 }
 
 SYSTEM_PROMPT = (
@@ -45,8 +53,15 @@ SYSTEM_PROMPT = (
 )
 
 
-def load_task(task: str) -> list[dict]:
-    path = DATA_DIR / TASK_FILES[task]
+def load_task(task: str, ext: bool = False) -> list[dict]:
+    if ext:
+        if task not in EXT_FILES:
+            return []
+        path = DATA_DIR / EXT_FILES[task]
+    else:
+        path = DATA_DIR / TASK_FILES[task]
+    if not path.exists():
+        return []
     with path.open(encoding="utf-8") as f:
         return [json.loads(line) for line in f]
 
@@ -103,11 +118,15 @@ def run_task(
     limit: int | None,
     extra_headers: dict | None = None,
     extra_body: dict | None = None,
+    ext: bool = False,
 ) -> dict:
-    records = load_task(task)
+    records = load_task(task, ext=ext)
+    if not records:
+        print(f"[{task}] no {'ext ' if ext else ''}data, skipping")
+        return None
     if limit:
         records = records[:limit]
-    print(f"[{task}] {len(records)} questions, concurrency={concurrency}")
+    print(f"[{task}{'·ext' if ext else ''}] {len(records)} questions, concurrency={concurrency}")
 
     preds = [None] * len(records)
     errors = 0
@@ -188,6 +207,8 @@ def main() -> None:
     ap.add_argument("--extra-body", type=str, default=None,
                     help="JSON merged into request payload, e.g. "
                     "'{\"chat_template_kwargs\": {\"enable_thinking\": false}}'")
+    ap.add_argument("--ext", action="store_true",
+                    help="run on extension items (data/*.ext.jsonl) instead of base set")
     args = ap.parse_args()
 
     extra_headers = {}
@@ -200,7 +221,10 @@ def main() -> None:
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     safe_name = args.model.replace("/", "_")
-    out_path = Path(args.out) if args.out else RESULTS_DIR / f"{safe_name}.json"
+    if args.ext:
+        out_path = Path(args.out) if args.out else RESULTS_DIR / f"{safe_name}.ext.json"
+    else:
+        out_path = Path(args.out) if args.out else RESULTS_DIR / f"{safe_name}.json"
 
     # Merge with existing file so partial-task runs don't drop earlier results.
     if out_path.exists():
@@ -232,7 +256,10 @@ def main() -> None:
             limit=args.limit,
             extra_headers=extra_headers or None,
             extra_body=extra_body,
+            ext=args.ext,
         )
+        if result is None:
+            continue
         all_results["tasks"][task] = result
         print(f"  ⇒ {task} summary: {result['summary']}")
 
