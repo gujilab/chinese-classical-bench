@@ -102,32 +102,33 @@ docs/tasks.md          # 任务详细说明
 
 完整带 95% 置信区间与 LLM judge 重排的版本见 [`leaderboard.md`](leaderboard.md)。
 
-| Model | translate (chrF) | punctuate (Punct F1) | char-gloss (chrF) | idiom-source (Book EM) | fill-in (Exact) | compress (Eff) | Avg (95% CI) |
+| Model | translate (chrF) | punctuate (Punct F1) | char-gloss (chrF) | idiom-source (Book EM) | fill-in (Exact) | compress (Eff) | Avg |
 |---|---|---|---|---|---|---|---|
-| **claude-opus-4-7** | **0.244** | **0.800** | **0.213** | 0.650 | 0.840 | 0.147 | **0.482 ±0.024** |
-| claude-opus-4-7-thinking | 0.242 | 0.790 | 0.207 | 0.630 | **0.870** | 0.091 | 0.472 ±0.024 |
-| claude-sonnet-4-6 | 0.231 | 0.785 | 0.157 | 0.560 | 0.700 | **0.163** | 0.432 ±0.027 |
-| deepseek-3.2 | 0.240 | 0.745 | 0.139 | **0.740** | 0.550 | **0.163** | 0.429 ±0.027 |
-| glm-5 | 0.241 | 0.799 | 0.176 | **0.740** | 0.440 | 0.153 | 0.425 ±0.026 |
-| minimax-m2.1 | 0.216 | 0.709 | 0.173 | 0.660 | 0.630 | 0.094 | 0.414 ±0.027 |
-| Qwen3.5-35B-A3B | 0.225 | 0.753 | 0.175 | 0.500 | 0.380 | — | 0.407 ±0.032 |
-| minimax-m2.5 | 0.219 | 0.709 | 0.161 | 0.550 | 0.590 | 0.092 | 0.387 ±0.027 |
-| qwen3-coder-next | 0.227 | 0.767 | 0.116 | 0.540 | 0.520 | 0.113 | 0.381 ±0.026 |
-| claude-haiku-4-5 | 0.204 | 0.729 | 0.128 | 0.340 | 0.350 | 0.087 | 0.306 ±0.026 |
+| **claude-opus-4-7** | **0.244** | **0.800** | **0.213** | 0.650 | 0.860 | **0.245** ⁑ | **0.502** |
+| claude-opus-4-7-thinking | 0.242 | 0.790 | 0.207 | 0.630 | **0.880** | 0.194 ⁑ | 0.490 |
+| claude-sonnet-4-6 | 0.231 | 0.785 | 0.157 | 0.560 | 0.700 | 0.163 | 0.433 |
+| deepseek-3.2 | 0.240 | 0.745 | 0.139 | **0.740** | 0.550 | 0.163 | 0.429 |
+| glm-5 | 0.241 | 0.799 | 0.176 | **0.740** | 0.450 | 0.153 | 0.427 |
+| minimax-m2.1 | 0.216 | 0.709 | 0.173 | 0.660 | 0.630 | 0.094 | 0.414 |
+| Qwen3.5-35B-A3B | 0.225 | 0.753 | 0.175 | 0.500 | 0.380 | — | 0.407 |
+| minimax-m2.5 | 0.219 | 0.709 | 0.174 | 0.618 ⁑ | 0.590 | 0.092 | 0.400 |
+| qwen3-coder-next | 0.227 | 0.767 | 0.116 | 0.540 | 0.520 | 0.113 | 0.380 |
+| claude-haiku-4-5 | 0.204 | 0.729 | 0.128 | 0.340 | 0.350 | 0.087 | 0.306 |
 
+> 上表 headline 为可复现的 chrF / EM / efficiency 点估计（`Avg` = 各 task headline 的简单平均）；完整的 **LLM-judge 重排 + 95% CI** 版本见 [`leaderboard.md`](leaderboard.md)（judge headline 下 Opus 4.7 ≈ 0.678）。bootstrap CI 由 `scripts/bootstrap_ci.py` (2000 iters, n=每 task 有效题数) 给出：**Opus 4.7 vs Opus thinking 的 Avg CI 重叠**——两个旗舰统计意义上不可区分；Sonnet / DeepSeek / GLM-5 同样多向重叠。
 > `compress (Eff)` = chrF × (1 − ratio)，同时奖励压缩率和保真度。人类参考上限 ≈ 0.49。
-> 95% CI 来自每题分数的 bootstrap 重采样 (`scripts/bootstrap_ci.py`, 2000 iters, n=100/task)。**Opus 4.7 vs Opus thinking 的 CI 重叠**——两个旗舰在这个基准上统计意义上不可区分。Sonnet / DeepSeek / GLM-5 同样三向重叠。
+> ⁑ **该 cell 经回溯修正**：原始运行中部分题 API 调用失败、被存成空预测并误判 0 分，污染了汇总。已把空预测标记为 error 并在剩余真实成功题上重算 —— `claude-opus-4-7` compress (n=60)、`claude-opus-4-7-thinking` compress (n=47)、`minimax-m2.5` idiom-source (n=89)。详见下方脚注与「已知 limitation」。
 
 **核心发现**：
 
-1. **Claude Opus 4.7 接管榜首**（0.482）—— 5 项第一（翻译 / 断句 / 字义 / 单字填空 / 见下"压缩"），仅典故记忆 (0.65) 和压缩 (0.15) 不是绝对最强。同代 Sonnet 4.6 仅 0.432、Haiku 4.5 仅 0.306 —— 同代差距 57%，说明"Claude 中文古典弱"是尺寸问题，不是数据问题
-2. **Thinking 模式整体退步** —— Opus 4.7 thinking 0.472 vs 非 thinking 0.482，6 项里 5 项 thinking 都更差。**典故 thinking 退步 (0.63 vs 0.65)、压缩崩塌 (0.091 vs 0.147)** —— thinking 在"力求简洁"的指令下走过头，把内容压成 ratio 0.26（人类 0.51），chrF 跌到 0.20。延长推理对"记忆"和"分寸"类任务无帮助甚至有害
-3. **压缩任务 Sonnet 4.6 / DeepSeek V3.2 并列 efficiency 第一（0.163）** —— 都把 ratio 维持在 ~0.52（人类基线 0.51），chrF 维持 0.35。GLM-5 (0.153) 紧随其后。Opus 系列倾向于"过度压缩"，ratio 仅 0.31，chrF 没掉太多但被效率公式惩罚。**这个任务直接验证了"中文古典作为信息密度工具"的可行性 —— 顶级模型已经能稳定输出 50% 压缩、保真度可接受的文言文**
+1. **Claude Opus 4.7 接管榜首**（chrF-headline Avg 0.502；judge-headline 0.678 见 `leaderboard.md`）—— **6 项里 5 项第一**：翻译 / 断句 / 字义 / 单字填空，外加**剔除 API 失败项重算后，压缩 efficiency 也跃居第一 (0.245)**，超过原先并列第一的 Sonnet / DeepSeek (0.163)；仅典故记忆 (0.65) 不是绝对最强。同代 Sonnet 4.6 仅 0.433、Haiku 4.5 仅 0.306 —— 同代差距巨大，说明"Claude 中文古典弱"是尺寸问题，不是数据问题
+2. **Thinking 模式略逊，但"压缩崩塌"是数据假象，不是真退步** —— Opus 4.7 thinking 0.490 vs 非 thinking 0.502，多数 task 持平到略低。之前榜单上的 **"thinking 压缩崩塌 0.091"是 artifact**：该次运行 100 题里 **53 题 API 调用失败、被当 0 分**。**剔除失败项后，thinking compress 真实 efficiency = 0.194（n=47，chrF 0.43、ratio 0.55），plain = 0.245（n=60，ratio 0.52）—— 两者都健康，不存在崩塌**。该型号已下架无法重跑，但当前旗舰 **Opus 4.6 干净数据（0 错误）印证：thinking 0.182 ≈ plain 0.180、ratio≈0.54**，thinking 与 plain 在压缩上几乎相等。延长推理对"记忆 / 分寸"类任务大体无帮助，但谈不上"崩塌"
+3. **压缩任务 Opus 4.7 修正后领先，"Opus 过度压缩"论断已撤销** —— 旧结论里"Opus ratio 仅 0.31、过度压缩"同样是 artifact：API 失败题 ratio 被记为 0 把均值拉低。**剔除后 Opus 4.7 ratio = 0.52、thinking = 0.55，正好落在人类基线 0.51 附近，并非过度压缩**；当前旗舰 Opus 4.6 干净数据 ratio≈0.54 进一步印证。efficiency 排序：**Opus 4.7 0.245 > thinking 0.194 > Sonnet 4.6 / DeepSeek V3.2 0.163 > glm-5 0.153**。**这个任务直接验证了"中文古典作为信息密度工具"的可行性 —— 顶级模型已能稳定输出 ~50% 压缩、保真度可接受的文言文**
 4. **典故识别国产模型已被 GLM-5 追平 DeepSeek** —— DeepSeek V3.2 / GLM-5 并列 (0.74) > MiniMax-2.1 (0.66) > Opus 4.7 (0.65)；老一轮 DeepSeek 独占第一的护城河没了，但相对 Claude 旗舰仍领先 9 个百分点
-5. **fill-in（单字填空）Claude 全家通吃** —— Opus thinking 0.87 / Opus 0.84 / Sonnet 0.70 / MiniMax-2.1 0.63 / DeepSeek 0.55，单字级中文古文恢复 Anthropic 系压倒性优势
-6. **GLM-5 综合最好的国产开源**（0.425）—— 5/6 项进前三（仅 fill-in 弱），与 DeepSeek (0.429) 仅差 0.004
-7. **Sonnet 4.6 性价比意外** —— avg 0.432，比 DeepSeek (0.429) 高 0.003，且在压缩任务上并列第一，是 Claude 系性价比之选
-8. **MiniMax M2.1 → M2.5 是中文古典 retrograde** —— 新版 m2.5 (0.387) 反而低于老版 m2.1 (0.414)，主要回退在 idiom-source (0.55 vs 0.66) 和 fill-in (0.59 vs 0.63)。新版可能针对其他能力做了优化但损伤了中文古典记忆
+5. **fill-in（单字填空）Claude 全家通吃** —— Opus thinking 0.88 / Opus 0.86 / Sonnet 0.70 / MiniMax-2.1 0.63 / DeepSeek 0.55，单字级中文古文恢复 Anthropic 系压倒性优势
+6. **GLM-5 综合最好的国产开源**（0.427）—— 5/6 项进前三（仅 fill-in 弱），与 DeepSeek (0.429) 仅差 0.002
+7. **Sonnet 4.6 性价比意外** —— avg 0.433，比 DeepSeek (0.429) 高一点，曾在压缩任务并列第一（0.163）；不过修正后 Opus 系压缩反超，Sonnet 退居 compress 第三。仍是 Claude 系性价比之选
+8. **MiniMax M2.1 → M2.5 是中文古典 retrograde** —— 新版 m2.5 (0.400) 仍低于老版 m2.1 (0.414)。其 idiom-source 原始运行有 11/100 题 API 失败、被当 0 分；**剔除后 m2.5 idiom-source = 0.618（n=89）**，仍低于 m2.1 (0.66)；fill-in 也回退 (0.59 vs 0.63)。新版可能针对其他能力做了优化但损伤了中文古典记忆
 
 > 欢迎提交其他模型结果（开 PR 把 `results/<model>.json` 加进来即可）。
 > Sonnet/Opus、DeepSeek、Llama、ChatGLM 等正在补充中。
@@ -154,6 +155,7 @@ docs/tasks.md          # 任务详细说明
 
 ## 已知 limitation
 
+- **部分早期运行有 API 失败题被误判 0 分（已回溯修正）** —— `claude-opus-4-7` compress 100 题里 40 题、`claude-opus-4-7-thinking` compress 53 题、`minimax-m2.5` char-gloss 7 题 / idiom-source 11 题，原始运行 API 调用失败、被存成空预测且**无 error 标记**，被打成全 0 分污染了汇总（空预测数 == 该 task 记录的 errors 数，已核对一致）。已用 `scripts/flag_empty_errors.py` 把这些题标记为 error 并在剩余真实成功题上重算 summary（compress n=60 / 47、char-gloss n=93、idiom-source n=89）。**opus-4-7 系列该型号已从网关下架、无法重跑**；当前旗舰 **Opus 4.6 干净数据（0 错误，仅跑了 compress）**作为参照印证，存于 [`results/_supplementary/`](results/_supplementary/)（不进主榜单以免出现只有 1/6 task 的稀疏行）—— Opus 4.6 compress efficiency=0.180 / thinking=0.182、ratio≈0.54，与 4.7 修正后的结论一致。
 - `translate` / `char-gloss` 用 chrF 评分，对同义改写过严 — **已加 LLM judge 实验：[experiments/llm-judge](experiments/llm-judge/)**（Pearson 0.46-0.47，建议结合使用而非替换）
 - 6 个 task 题目均从配套 corpus 抽样，可能与某些模型的训练数据有重合污染（开源模型大多训练过《十三经》《史记》）
 - 100 题/task 是 trade-off：太少噪声大，太多跑评测贵 — 后续可能扩到 200/task
