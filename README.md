@@ -2,7 +2,7 @@
 
 [![license](https://img.shields.io/badge/code-MIT-yellow)](LICENSE) [![data](https://img.shields.io/badge/questions-from%20CC0%20corpus-lightgrey)](https://huggingface.co/datasets/gujilab/chinese-classical-corpus) [![HF dataset](https://img.shields.io/badge/%F0%9F%A4%97-dataset-blue)](https://huggingface.co/datasets/gujilab/chinese-classical-bench) [![HF leaderboard](https://img.shields.io/badge/%F0%9F%A4%97-leaderboard-orange)](https://huggingface.co/spaces/gujilab/chinese-classical-bench-leaderboard)
 
-中国古典语言能力评测基准 (Classical Chinese benchmark) — **5 个任务 × 100 题 = 500 道**，覆盖翻译、断句、字义、典故、续写填空。
+中国古典语言能力评测基准 (Classical Chinese benchmark) — **6 个任务 × 100 题 = 600 道**，覆盖翻译、断句、字义、典故、续写填空、压缩。
 
 > 📊 在线排行榜: [🤗 Space — chinese-classical-bench-leaderboard](https://huggingface.co/spaces/gujilab/chinese-classical-bench-leaderboard)
 > 🤗 本评测集也在 HuggingFace: [gujilab/chinese-classical-bench](https://huggingface.co/datasets/gujilab/chinese-classical-bench) — `load_dataset("gujilab/chinese-classical-bench", "translate")`
@@ -66,6 +66,7 @@ python scripts/build_punctuate.py
 python scripts/build_char_gloss.py
 python scripts/build_idiom_source.py
 python scripts/build_fill_in.py
+python scripts/build_compress.py
 
 # 2. 跑评测（需先启动 vLLM endpoint）
 python scripts/eval_runner.py \
@@ -87,7 +88,7 @@ python scripts/aggregate.py --out leaderboard.md
 ## 文件布局
 
 ```
-data/                  # 5 × 100 道题 (jsonl)
+data/                  # 6 × 100 道题 (jsonl)
 scripts/
   build_*.py           # 各 task 题目生成脚本
   eval_runner.py       # OpenAI 兼容 API 调用 + 打分
@@ -156,6 +157,7 @@ docs/tasks.md          # 任务详细说明
 - `translate` / `char-gloss` 用 chrF 评分，对同义改写过严 — **已加 LLM judge 实验：[experiments/llm-judge](experiments/llm-judge/)**（Pearson 0.46-0.47，建议结合使用而非替换）
 - 6 个 task 题目均从配套 corpus 抽样，可能与某些模型的训练数据有重合污染（开源模型大多训练过《十三经》《史记》）
 - 100 题/task 是 trade-off：太少噪声大，太多跑评测贵 — 后续可能扩到 200/task
+- **`idiom-source` 有一版 contamination-robust 重采样 `data/idiom_source.v2.jsonl`（已生成、尚未启用）** —— 它从 Tier-1 冷门书目重新抽样，意在让分数反映"古文能力"而非"认出《论语》/《史记》"（详见 `scripts/build_idiom_source_v2.py` 与 `docs/findings.md` §6）。**当前 `eval_runner.py` 仍读 v1**（`data/idiom_source.jsonl`）：切到 v2 会让所有已存 `results/*.json` 的 idiom-source 预测失效、必须全量重跑该任务，故暂不切换。v2 文件保留待后续做一次专门的 idiom-source rerun 时再启用，不是被遗忘的半成品。
 - **31 题有数据质量问题**，已用 `metadata._audit_issue` 标注（含 char-gloss 18 题 gold 为字典占位符 `同本义。`，由题目区分度分析发现）。详见 [docs/quality-audit.md](docs/quality-audit.md)，方法与全部发现见 **[docs/findings.md](docs/findings.md)**（题目难度/区分度心理测量学审计，零成本回溯；含[污染探针](docs/contamination.md) `idiom-source` ρ=0.68 与[任务冗余分析](docs/task-redundancy.md)）。可通过 `ds.filter(lambda x: not x['metadata'].get('_audit_issue'))` 过滤。题目未删除以保持已有 result 文件兼容
 
 ## Contributing

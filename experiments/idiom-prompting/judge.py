@@ -7,6 +7,7 @@ Output: judge_results.jsonl
 """
 import asyncio
 import json
+import os
 import random
 import sys
 from pathlib import Path
@@ -14,9 +15,11 @@ from collections import defaultdict
 
 from openai import AsyncOpenAI
 
-BASE_URL = "http://localhost:8990/v1"
-API_KEY = "sk-kiro-test-123456"
-JUDGE = "claude-opus-4-7"
+BASE_URL = os.environ.get("KCLI_BASE_URL", "http://localhost:8990/v1")
+API_KEY = os.environ.get("KCLI_API_KEY")
+if not API_KEY:
+    sys.exit("KCLI_API_KEY not set — export it before running (no default key).")
+JUDGE = os.environ.get("JUDGE_MODEL", "claude-opus-4-7")
 CONCURRENCY = 4
 
 HERE = Path(__file__).parent

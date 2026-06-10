@@ -16,6 +16,29 @@ RESULTS = REPO / "results"
 TASKS = {"translate", "punctuate", "char-gloss", "idiom-source", "fill-in", "compress"}
 N_PER_TASK = 100
 
+# Above this fraction of API-error items, a task's summary is statistically
+# untrustworthy (too few real scores). Reported as a hard validation error.
+MAX_ERROR_RATE = 0.05
+
+
+def _task_error_rate(tr: dict, items: list) -> float:
+    """Best-effort API-error rate for a task, tolerant of older result files.
+
+    Prefers the explicit `error_rate` field; falls back to `errors`/`n`; and
+    finally counts items carrying an `error` field (new eval_runner schema).
+    Legacy files predate all of these → rate 0.0 (cannot assess, don't gate).
+    """
+    if isinstance(tr.get("error_rate"), (int, float)):
+        return float(tr["error_rate"])
+    n = tr.get("n") or len(items) or 0
+    errors = tr.get("errors")
+    if isinstance(errors, int) and n:
+        return errors / n
+    if items:
+        n_err = sum(1 for it in items if isinstance(it, dict) and it.get("error"))
+        return n_err / len(items)
+    return 0.0
+
 
 def validate_file(fp: Path) -> list[str]:
     errs: list[str] = []
@@ -55,6 +78,18 @@ def validate_file(fp: Path) -> list[str]:
         if not isinstance(items, list):
             errs.append(f"{fp.name}: tasks.{t}.items missing or not a list")
             continue
+        # High API-error rate => the summary is computed from too few real
+        # scores to trust. We WARN rather than fail: some already-committed
+        # legacy results predate the retry/error-tracking fix and carry high
+        # error rates (notably the `compress` task on the Opus runs), and we
+        # must not gate CI on data we can't retroactively re-run here. A warning
+        # makes the unreliability visible without breaking existing files.
+        err_rate = _task_error_rate(tr, items)
+        if err_rate > MAX_ERROR_RATE:
+            print(
+                f"  warn: {fp.name}: tasks.{t} API error rate {err_rate:.1%} "
+                f"exceeds {MAX_ERROR_RATE:.0%} — summary UNRELIABLE, re-run this task"
+            )
         if len(items) > N_PER_TASK:
             errs.append(f"{fp.name}: tasks.{t}.items has {len(items)}, max allowed {N_PER_TASK}")
         elif len(items) < N_PER_TASK:

@@ -37,7 +37,9 @@ from datasets import load_dataset  # noqa: E402
 
 ROOT = Path(__file__).parent
 BASE_URL = os.environ.get("KCLI_BASE_URL", "http://localhost:8990/v1")
-API_KEY = os.environ.get("KCLI_API_KEY", "sk-kiro-test-123456")
+API_KEY = os.environ.get("KCLI_API_KEY")
+if not API_KEY:
+    sys.exit("KCLI_API_KEY not set — export it before running (no default key).")
 TRANSLATOR = os.environ.get("TRANSLATOR_MODEL", "claude-sonnet-4-6")
 EVAL_MODELS = os.environ.get(
     "EVAL_MODELS", "claude-opus-4-7,deepseek-3.2,qwen3-coder-next"
