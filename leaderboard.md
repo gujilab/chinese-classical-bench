@@ -6,18 +6,27 @@
 
 | Tier | Model | translate (Judge) | punctuate (Punct F1) | char-gloss (Judge) | idiom-source (Book EM) | fill-in (Exact) | compress (Compress Eff) | Preserve | Avg |
 |---|---|---|---|---|---|---|---|---|---|
+| A | claude-opus-4-7 | — | 0.783 ±0.063 | — | — | 0.870 ±0.065 | 0.187 ±0.041 | 0.790 | **0.678 ±0.025 ⚠** |
 | A | claude-opus-4-7 | 0.800 ±0.040 | 0.800 ±0.063 | 0.716 ±0.049 | 0.650 ±0.090 | 0.860 ±0.065 | 0.245 ±0.041 | 0.820 | **0.678 ±0.025** |
+| A | claude-opus-4-7-thinking | — | 0.813 ±0.065 | — | — | 0.930 ±0.065 | 0.191 ±0.037 | 0.840 | **0.672 ±0.025 ⚠** |
 | A | claude-opus-4-7-thinking | 0.802 ±0.043 | 0.790 ±0.065 | 0.736 ±0.044 | 0.630 ±0.095 | 0.880 ±0.065 | 0.194 ±0.037 | 0.820 | **0.672 ±0.025** |
+| B | claude-sonnet-4-6 | — | 0.794 ±0.061 | — | — | 0.650 ±0.090 | 0.152 ±0.023 | 0.780 | **0.613 ±0.028 ⚠** |
 | B | claude-sonnet-4-6 | 0.776 ±0.047 | 0.785 ±0.061 | 0.694 ±0.050 | 0.560 ±0.095 | 0.700 ±0.090 | 0.163 ±0.023 | 0.740 | **0.613 ±0.028** |
 | B | Qwen3.5-35B-A3B | 0.728 ±0.048 | 0.753 ±0.062 | 0.620 ±0.052 | 0.500 ±0.100 | 0.380 ±0.090 | — | 0.690 | **0.596 ±0.032 ⚠** |
+| B | glm-5 | — | 0.779 ±0.062 | — | — | 0.460 ±0.100 | 0.153 ±0.018 | 0.730 | **0.588 ±0.028 ⚠** |
 | B | glm-5 | 0.748 ±0.048 | 0.799 ±0.062 | 0.638 ±0.055 | 0.740 ±0.085 | 0.450 ±0.100 | 0.153 ±0.018 | 0.790 | **0.588 ±0.028** |
+| B | minimax-m2.1 | — | 0.768 ±0.072 | — | — | 0.540 ±0.095 | 0.102 ±0.010 | 0.590 | **0.582 ±0.028 ⚠** |
 | B | minimax-m2.1 | 0.704 ±0.053 | 0.709 ±0.072 | 0.695 ±0.056 | 0.660 ±0.090 | 0.630 ±0.095 | 0.094 ±0.010 | 0.620 | **0.582 ±0.028** |
+| B | deepseek-3.2 | — | 0.751 ±0.069 | — | — | 0.500 ±0.100 | 0.155 ±0.020 | 0.800 | **0.582 ±0.027 ⚠** |
 | B | deepseek-3.2 | 0.754 ±0.045 | 0.745 ±0.069 | 0.538 ±0.062 | 0.740 ±0.085 | 0.550 ±0.100 | 0.163 ±0.020 | 0.770 | **0.582 ±0.027** |
+| B | minimax-m2.5 | — | 0.753 ±0.068 | — | — | 0.560 ±0.095 | 0.096 ±0.008 | 0.570 | **0.561 ±0.028 ⚠** |
 | B | minimax-m2.5 | 0.704 ±0.049 | 0.709 ±0.068 | 0.654 ±0.057 | 0.618 ±0.101 | 0.590 ±0.095 | 0.092 ±0.008 | 0.620 | **0.561 ±0.028** |
+| C | qwen3-coder-next | — | 0.743 ±0.062 | — | — | 0.460 ±0.100 | 0.106 ±0.011 | 0.620 | **0.548 ±0.028 ⚠** |
 | C | qwen3-coder-next | 0.746 ±0.048 | 0.767 ±0.062 | 0.602 ±0.057 | 0.540 ±0.100 | 0.520 ±0.100 | 0.113 ±0.011 | 0.660 | **0.548 ±0.028** |
+| D | claude-haiku-4-5-20251001 | — | 0.723 ±0.062 | — | — | 0.150 ±0.090 | 0.062 ±0.009 | 0.700 | **0.460 ±0.028 ⚠** |
 | D | claude-haiku-4-5-20251001 | 0.675 ±0.049 | 0.729 ±0.062 | 0.578 ±0.058 | 0.340 ±0.090 | 0.350 ±0.090 | 0.087 ±0.009 | 0.720 | **0.460 ±0.028** |
 
-⚠ Avg is the mean of *available* task headlines — not strictly comparable for: `Qwen3.5-35B-A3B` missing compress. Excluding a low-scoring task (e.g. `compress`) inflates that model's Avg.
+⚠ Avg is the mean of *available* task headlines — not strictly comparable for: `claude-opus-4-7` missing translate,char-gloss,idiom-source; `claude-opus-4-7-thinking` missing translate,char-gloss,idiom-source; `claude-sonnet-4-6` missing translate,char-gloss,idiom-source; `Qwen3.5-35B-A3B` missing compress; `glm-5` missing translate,char-gloss,idiom-source; `minimax-m2.1` missing translate,char-gloss,idiom-source; `deepseek-3.2` missing translate,char-gloss,idiom-source; `minimax-m2.5` missing translate,char-gloss,idiom-source; `qwen3-coder-next` missing translate,char-gloss,idiom-source; `claude-haiku-4-5-20251001` missing translate,char-gloss,idiom-source. Excluding a low-scoring task (e.g. `compress`) inflates that model's Avg.
 
 ## Canonicity-stratified — recall vs. competence
 
@@ -35,6 +44,15 @@ Avg restricted to items whose source is core canon (**T3**: 论语/史记/诗经
 | qwen3-coder-next | 0.599 | 0.561 | 0.455 | +0.144 |
 | minimax-m2.5 | 0.578 | 0.378 | 0.445 | +0.132 |
 | claude-haiku-4-5-20251001 | 0.461 | 0.304 | 0.434 | +0.027 |
+| claude-opus-4-7 | — | — | — | — |
+| claude-opus-4-7-thinking | — | — | — | — |
+| claude-sonnet-4-6 | — | — | — | — |
+| glm-5 | — | — | — | — |
+| minimax-m2.1 | — | — | — | — |
+| deepseek-3.2 | — | — | — | — |
+| minimax-m2.5 | — | — | — | — |
+| qwen3-coder-next | — | — | — | — |
+| claude-haiku-4-5-20251001 | — | — | — | — |
 
 ## Transparency — chrF floor & two-judge cross-check (translate / char-gloss)
 
@@ -42,14 +60,23 @@ The judge headline above is **Opus**. Here it is shown next to the reproducible 
 
 | Model | translate chrF | translate Opus | translate Sonnet | char-gloss chrF | char-gloss Opus | char-gloss Sonnet |
 |---|---|---|---|---|---|---|
+| claude-opus-4-7 | 0.272 | — | — | — | — | — |
 | claude-opus-4-7 | 0.244 | 0.800 | 0.780 | 0.213 | 0.716 | 0.700 |
+| claude-opus-4-7-thinking | 0.270 | — | — | — | — | — |
 | claude-opus-4-7-thinking | 0.242 | 0.802 | 0.770 | 0.207 | 0.736 | 0.706 |
+| claude-sonnet-4-6 | 0.250 | — | — | — | — | — |
 | claude-sonnet-4-6 | 0.231 | 0.776 | 0.756 | 0.157 | 0.694 | 0.700 |
 | Qwen3.5-35B-A3B | 0.225 | 0.728 | 0.732 | 0.175 | 0.620 | 0.630 |
+| glm-5 | 0.243 | — | — | — | — | — |
 | glm-5 | 0.241 | 0.748 | 0.750 | 0.176 | 0.638 | 0.644 |
+| minimax-m2.1 | 0.227 | — | — | — | — | — |
 | minimax-m2.1 | 0.216 | 0.704 | 0.708 | 0.173 | 0.695 | 0.685 |
+| deepseek-3.2 | 0.270 | — | — | — | — | — |
 | deepseek-3.2 | 0.240 | 0.754 | 0.738 | 0.139 | 0.538 | 0.554 |
+| minimax-m2.5 | 0.246 | — | — | — | — | — |
 | minimax-m2.5 | 0.219 | 0.704 | 0.688 | 0.174 | 0.654 | 0.662 |
+| qwen3-coder-next | 0.233 | — | — | — | — | — |
 | qwen3-coder-next | 0.227 | 0.746 | 0.746 | 0.116 | 0.602 | 0.592 |
+| claude-haiku-4-5-20251001 | 0.037 | — | — | — | — | — |
 | claude-haiku-4-5-20251001 | 0.204 | 0.675 | 0.682 | 0.128 | 0.578 | 0.574 |
 
