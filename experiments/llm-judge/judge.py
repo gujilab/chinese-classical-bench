@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import concurrent.futures as cf
 import json
+import os
 import re
 import sys
 import time
@@ -40,9 +41,11 @@ DEFAULT_MODELS = [
 ]
 DEFAULT_TASKS = ["translate", "char-gloss"]
 
-BASE_URL = "http://localhost:8990/v1"
-API_KEY = "sk-kiro-test-123456"
-JUDGE_MODEL = "claude-opus-4-7"
+BASE_URL = os.environ.get("KCLI_BASE_URL", "http://localhost:8990/v1")
+API_KEY = os.environ.get("KCLI_API_KEY")
+if not API_KEY:
+    sys.exit("KCLI_API_KEY not set — export it before running (no default key).")
+JUDGE_MODEL = os.environ.get("JUDGE_MODEL", "claude-opus-4-7")
 MAX_CONCURRENCY = 8  # gateway raised to 6000 rpm + burst 1000; 5 is safe with sibling agents
 TIMEOUT_S = 90
 MAX_TOKENS = 8

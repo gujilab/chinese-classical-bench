@@ -60,8 +60,12 @@ def rescore_file(fp: Path, recs: dict[str, dict]) -> tuple[dict, dict]:
             rec = recs.get(it["id"])
             if rec is None:
                 continue
+            # Skip API-error items (prediction is None / has an `error` field):
+            # they carry no data and must not be re-scored to a fake 0.
+            if it.get("error") is not None or it.get("prediction") is None:
+                continue
             sc = score(rec, it.get("prediction", ""))
-            preserved = {k: v for k, v in it.get("scores", {}).items()
+            preserved = {k: v for k, v in (it.get("scores") or {}).items()
                          if k in JUDGE_KEYS}
             it["scores"] = {**sc, **preserved}
             for k, v in it["scores"].items():

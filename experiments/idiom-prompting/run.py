@@ -12,6 +12,7 @@ Output: results.jsonl
 """
 import asyncio
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -19,8 +20,10 @@ from pathlib import Path
 import tiktoken
 from openai import AsyncOpenAI
 
-BASE_URL = "http://localhost:8990/v1"
-API_KEY = "sk-kiro-test-123456"
+BASE_URL = os.environ.get("KCLI_BASE_URL", "http://localhost:8990/v1")
+API_KEY = os.environ.get("KCLI_API_KEY")
+if not API_KEY:
+    sys.exit("KCLI_API_KEY not set — export it before running (no default key).")
 MODELS = ["claude-opus-4-7", "deepseek-3.2", "qwen3-coder-next"]
 CONCURRENCY = 8
 MAX_TOKENS = 700  # answer budget

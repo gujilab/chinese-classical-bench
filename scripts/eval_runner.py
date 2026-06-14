@@ -1,5 +1,5 @@
 """Eval runner: query an OpenAI-compatible endpoint (vLLM / Anthropic / OpenAI)
-on all 5 benchmark tasks and compute per-task metrics.
+on all 6 benchmark tasks and compute per-task metrics.
 
 Usage:
   python eval_runner.py --model Qwen/Qwen3-7B-Instruct \
@@ -13,6 +13,7 @@ Usage:
 import argparse
 import concurrent.futures as cf
 import json
+import random
 import statistics
 import sys
 import time
@@ -30,6 +31,10 @@ from scorers import score  # noqa: E402
 
 DATA_DIR = REPO / "data"
 RESULTS_DIR = REPO / "results"
+
+# Bounded retry with exponential backoff for transient API failures.
+MAX_RETRIES = 3
+RETRY_BACKOFF_BASE = 1.0  # seconds; attempt n waits ~base * 2**n + jitter
 
 TASK_FILES = {
     "translate": "translate.jsonl",
@@ -129,19 +134,34 @@ def run_task(
     print(f"[{task}{'·ext' if ext else ''}] {len(records)} questions, concurrency={concurrency}")
 
     preds = [None] * len(records)
+    errs = [None] * len(records)  # per-item error string (None = succeeded)
     errors = 0
     t0 = time.time()
 
     def worker(i: int, rec: dict):
-        try:
-            prompt = make_prompt(rec)
-            return i, chat_completion(
-                base_url, api_key, model, prompt,
-                extra_headers=extra_headers,
-                extra_body=extra_body,
-            ), None
-        except Exception as e:
-            return i, "", str(e)
+        """Call the endpoint with bounded retries + exponential backoff.
+
+        Returns (i, prediction, error). On total failure prediction is None
+        and error is the last exception string — callers MUST treat such items
+        as "no data" rather than a genuine score of 0.
+        """
+        prompt = make_prompt(rec)
+        last_err: Exception | None = None
+        for attempt in range(MAX_RETRIES):
+            try:
+                pred = chat_completion(
+                    base_url, api_key, model, prompt,
+                    extra_headers=extra_headers,
+                    extra_body=extra_body,
+                )
+                return i, pred, None
+            except Exception as e:  # noqa: BLE001
+                last_err = e
+                if attempt < MAX_RETRIES - 1:
+                    # exponential backoff with small jitter
+                    sleep_s = RETRY_BACKOFF_BASE * (2 ** attempt) + random.uniform(0, 0.5)
+                    time.sleep(sleep_s)
+        return i, None, str(last_err)
 
     with cf.ThreadPoolExecutor(max_workers=concurrency) as pool:
         futs = [pool.submit(worker, i, r) for i, r in enumerate(records)]
@@ -149,6 +169,7 @@ def run_task(
         for fut in cf.as_completed(futs):
             i, pred, err = fut.result()
             preds[i] = pred
+            errs[i] = err
             if err:
                 errors += 1
                 if errors <= 3:
@@ -158,21 +179,32 @@ def run_task(
                 print(f"  {done}/{len(records)}  ({time.time()-t0:.0f}s, {errors} err)")
 
     # score
+    #
+    # IMPORTANT: items that ended in an API error (pred is None) are NOT scored
+    # and NOT folded into the summary metrics — an API failure is missing data,
+    # not a model output worth 0. They are still emitted in `items` with an
+    # `error` field so downstream tooling can see exactly which questions failed.
     items = []
     metric_acc: dict[str, list[float]] = {}
-    for rec, pred in zip(records, preds):
-        s = score(rec, pred if pred is not None else "")
-        for k, v in s.items():
-            metric_acc.setdefault(k, []).append(v)
-        items.append(
-            {
-                "id": rec["id"],
-                "input": rec["input"],
-                "reference": rec["reference"],
-                "prediction": pred,
-                "scores": s,
-            }
-        )
+    n_scored = 0
+    for rec, pred, err in zip(records, preds, errs):
+        item = {
+            "id": rec["id"],
+            "input": rec["input"],
+            "reference": rec["reference"],
+            "prediction": pred,
+        }
+        if err is not None or pred is None:
+            # API error / no response: record the error, leave scores absent.
+            item["error"] = err if err is not None else "no response"
+            item["scores"] = None
+        else:
+            s = score(rec, pred)
+            for k, v in s.items():
+                metric_acc.setdefault(k, []).append(v)
+            item["scores"] = s
+            n_scored += 1
+        items.append(item)
 
     summary = {
         m: round(statistics.fmean(v), 4) for m, v in metric_acc.items()
@@ -180,7 +212,11 @@ def run_task(
     return {
         "task": task,
         "n": len(records),
+        # number of items actually scored (excludes API-error items)
+        "n_scored": n_scored,
         "errors": errors,
+        # fraction of items that failed with an API error (0..1)
+        "error_rate": round(errors / len(records), 4) if records else 0.0,
         "elapsed_sec": round(time.time() - t0, 1),
         "summary": summary,
         "items": items,
@@ -269,7 +305,12 @@ def main() -> None:
     print(f"\nwrote → {out_path.relative_to(REPO)}")
     print("\n=== summary ===")
     for t, r in all_results["tasks"].items():
-        print(f"  {t:<14}  {r['summary']}  (errors={r['errors']})")
+        er = r.get("error_rate", 0.0)
+        flag = "  ⚠️ HIGH ERROR RATE — results unreliable" if er > 0.05 else ""
+        print(
+            f"  {t:<14}  {r['summary']}  "
+            f"(errors={r['errors']}, error_rate={er:.1%}){flag}"
+        )
 
 
 if __name__ == "__main__":

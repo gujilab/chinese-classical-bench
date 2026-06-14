@@ -18,9 +18,11 @@ from pathlib import Path
 
 from openai import AsyncOpenAI
 
-BASE_URL = "http://localhost:8990/v1"
-API_KEY = "sk-kiro-test-123456"
-MODEL = "claude-sonnet-4-6"
+BASE_URL = os.environ.get("KCLI_BASE_URL", "http://localhost:8990/v1")
+API_KEY = os.environ.get("KCLI_API_KEY")
+if not API_KEY:
+    sys.exit("KCLI_API_KEY not set — export it before running (no default key).")
+MODEL = os.environ.get("GEN_MODEL", "claude-sonnet-4-6")
 CONCURRENCY = 1
 
 HERE = Path(__file__).parent

@@ -14,13 +14,15 @@ See: experiments/llm-judge/report.md for correlation analysis and rationale.
 from __future__ import annotations
 
 import json
+import os
 import re
 import urllib.error
 import urllib.request
 
-DEFAULT_BASE_URL = "http://localhost:8990/v1"
-DEFAULT_API_KEY = "sk-kiro-test-123456"
-DEFAULT_JUDGE_MODEL = "claude-opus-4-7"
+DEFAULT_BASE_URL = os.environ.get("JUDGE_BASE_URL", "http://localhost:8990/v1")
+# No hardcoded key: read from env, error at call time if unset.
+DEFAULT_API_KEY = os.environ.get("JUDGE_API_KEY", "")
+DEFAULT_JUDGE_MODEL = os.environ.get("JUDGE_MODEL", "claude-opus-4-7")
 
 PROMPT_TRANSLATE = """你是古文翻译评分专家。请阅读原文、参考翻译、模型译文，给模型译文打分 0-5 整数:
 0 = 完全错误或胡说
@@ -103,6 +105,10 @@ def score_with_judge(
     """
     if task not in PROMPTS:
         raise ValueError(f"judge not configured for task={task!r}")
+    if not api_key:
+        raise RuntimeError(
+            "judge API key not set — export JUDGE_API_KEY (or pass api_key=...)"
+        )
     prompt = PROMPTS[task].format(
         input=rec.get("input", ""),
         reference=rec.get("reference", ""),

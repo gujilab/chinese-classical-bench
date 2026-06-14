@@ -2540,8 +2540,8 @@
       "errors": 7,
       "elapsed_sec": 739.3,
       "summary": {
-        "chrf": 0.1614,
-        "char_f1": 0.2296,
+        "chrf": 0.1736,
+        "char_f1": 0.2469,
         "judge": 3.2688,
         "judge_norm": 0.6538,
         "judge_sonnet": 3.3118,
@@ -3381,10 +3381,8 @@
           "input": "字：斩\n出处：斫头曰斩,斩要曰要斩。（《释名·释丧制》）",
           "reference": "同本义。",
           "prediction": "",
-          "scores": {
-            "chrf": 0.0,
-            "char_f1": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "char-gloss#61",
@@ -3405,20 +3403,16 @@
           "input": "字：风\n出处：他如今大了,渐知风月,便看上了秦钟人物风流。（《红楼梦》）",
           "reference": "男女间的情爱。",
           "prediction": "",
-          "scores": {
-            "chrf": 0.0,
-            "char_f1": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "char-gloss#63",
           "input": "字：枋\n出处：突然,他抓起一根短短的木枋,站起来,走到柜台边。（谭秀牧《失去的黑金刚》）",
           "reference": "泛指木棒。",
           "prediction": "",
-          "scores": {
-            "chrf": 0.0,
-            "char_f1": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "char-gloss#64",
@@ -3523,10 +3517,8 @@
           "input": "字：颈\n出处：七星;颈,为员官,主急事。（《史记》）",
           "reference": "一星名。",
           "prediction": "",
-          "scores": {
-            "chrf": 0.0,
-            "char_f1": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "char-gloss#72",
@@ -3603,10 +3595,8 @@
           "input": "字：璋\n出处：璋,剡上为圭,半圭为璋。（《说文》）",
           "reference": "同本义。",
           "prediction": "",
-          "scores": {
-            "chrf": 0.0,
-            "char_f1": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "char-gloss#78",
@@ -3669,20 +3659,16 @@
           "input": "字：叭\n出处：只三叭两咽,就是一碗。（《金瓶梅词话》）",
           "reference": "将食物扒入口中。",
           "prediction": "",
-          "scores": {
-            "chrf": 0.0,
-            "char_f1": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "char-gloss#83",
           "input": "字：亢\n出处：吉不能亢身,焉能抗宗?（《左传·昭公元年》）",
           "reference": "蔽,庇护。",
           "prediction": "",
-          "scores": {
-            "chrf": 0.0,
-            "char_f1": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "char-gloss#84",
@@ -3922,7 +3908,9 @@
             "judge_sonnet_norm": 0.4
           }
         }
-      ]
+      ],
+      "n_scored": 93,
+      "error_rate": 0.07
     },
     "idiom-source": {
       "task": "idiom-source",
@@ -3930,8 +3918,8 @@
       "errors": 11,
       "elapsed_sec": 2125.2,
       "summary": {
-        "book_em": 0.55,
-        "quote_chrf": 0.2014
+        "book_em": 0.618,
+        "quote_chrf": 0.2263
       },
       "items": [
         {
@@ -3939,10 +3927,8 @@
           "input": "运筹借箸",
           "reference": "出自《史记》：「求借所食之箸用指画也。」",
           "prediction": "",
-          "scores": {
-            "book_em": 0.0,
-            "quote_chrf": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "idiom-source#2",
@@ -4029,10 +4015,8 @@
           "input": "羽化飞天",
           "reference": "出自《魏书》：「至于化金销玉，行符敕水，奇方妙术，万等千条，上云羽化飞天，次称消灾灭祸。」",
           "prediction": "",
-          "scores": {
-            "book_em": 0.0,
-            "quote_chrf": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "idiom-source#11",
@@ -4069,10 +4053,8 @@
           "input": "不屈不挠",
           "reference": "出自《汉书》：「乐昌笃实，不桡不诎。」",
           "prediction": "",
-          "scores": {
-            "book_em": 0.0,
-            "quote_chrf": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "idiom-source#15",
@@ -4099,20 +4081,16 @@
           "input": "天下大乱",
           "reference": "出自《汉书》：「前日天下大乱，兵革并起，尤民苦殃。」",
           "prediction": "",
-          "scores": {
-            "book_em": 0.0,
-            "quote_chrf": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "idiom-source#18",
           "input": "妖由人兴",
           "reference": "出自《左传》：「妖由人兴也。人无衅焉，妖不自作。」",
           "prediction": "",
-          "scores": {
-            "book_em": 0.0,
-            "quote_chrf": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "idiom-source#19",
@@ -4209,10 +4187,8 @@
           "input": "正身明法",
           "reference": "出自《晋书》：「二千石令长当袛奉旧宪，正身明法，抑齐豪强，存恤孤独，隐实户口，劝课农桑。」",
           "prediction": "",
-          "scores": {
-            "book_em": 0.0,
-            "quote_chrf": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "idiom-source#29",
@@ -4279,20 +4255,16 @@
           "input": "饰垢掩疵",
           "reference": "出自《魏书》：「虽当时文簿，记其殿最，日久月深，驳落都尽……累年之后，方求追访声迹，立其考第。无不苟相悦附，共为唇齿，饰垢掩疵，妄加丹素，趣令得阶而已，无所顾惜。」",
           "prediction": "",
-          "scores": {
-            "book_em": 0.0,
-            "quote_chrf": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "idiom-source#36",
           "input": "殷殷田田",
           "reference": "出自《礼记》：「妇人不宜袒，故发胸，击心，爵踊，殷殷田田，如坏墙然，悲哀痛疾之至也。」",
           "prediction": "",
-          "scores": {
-            "book_em": 0.0,
-            "quote_chrf": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "idiom-source#37",
@@ -4349,10 +4321,8 @@
           "input": "信而好古",
           "reference": "出自《论语》：「述而不作，信而好古。」",
           "prediction": "",
-          "scores": {
-            "book_em": 0.0,
-            "quote_chrf": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "idiom-source#43",
@@ -4519,20 +4489,16 @@
           "input": "货赂公行",
           "reference": "出自《魏书》：「三公倾邪，皆希世见用，货赂并行，强者为怨，不见举奏，弱者守道，多被陷毁。」",
           "prediction": "",
-          "scores": {
-            "book_em": 0.0,
-            "quote_chrf": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "idiom-source#60",
           "input": "斫琱为朴",
           "reference": "出自《汉书》：「汉兴，破觚而为圜，斫琱而为朴，号为罔漏吞舟之鱼。」",
           "prediction": "",
-          "scores": {
-            "book_em": 0.0,
-            "quote_chrf": 0.0
-          }
+          "scores": null,
+          "error": "empty output (API failure, retroactively flagged)"
         },
         {
           "id": "idiom-source#61",
@@ -4934,7 +4900,9 @@
             "quote_chrf": 0.37168065511223025
           }
         }
-      ]
+      ],
+      "n_scored": 89,
+      "error_rate": 0.11
     },
     "fill-in": {
       "task": "fill-in",
