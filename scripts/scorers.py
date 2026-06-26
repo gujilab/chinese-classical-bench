@@ -249,6 +249,32 @@ def score_compress(pred: str, rec: dict) -> dict:
     }
 
 
+def score_collation(pred: str, rec: dict) -> dict:
+    """Single-char answer — same shape as fill-in.
+
+    Tests whether the model can parse classical-Chinese textual-criticism
+    conventions (一作 / 俗本作 / 当作 / 讹作 …) and return the canonical
+    reading. T2S normalization applied on both sides.
+    """
+    pred_s = _strip(pred)
+    ans = _strip(rec["reference"])
+    extracted = ""
+    m = re.search(r'[「『"\'"‘“]([一-鿿])[」』"\'"’”]', pred_s)
+    if m:
+        extracted = m.group(1)
+    else:
+        cn = _chinese_chars(pred_s)
+        if len(cn) == 1:
+            extracted = cn
+        elif cn:
+            extracted = cn[0]
+    ex_n, ans_n = _t2s(extracted), _t2s(ans)
+    return {
+        "exact_match": float(ex_n == ans_n and ex_n != ""),
+        "in_pred": float(ans in pred_s or ans_n in _t2s(pred_s)),
+    }
+
+
 SCORERS = {
     "translate": score_translate,
     "punctuate": score_punctuate,
@@ -256,6 +282,7 @@ SCORERS = {
     "idiom-source": score_idiom_source,
     "fill-in": score_fill_in,
     "compress": score_compress,
+    "collation": score_collation,
 }
 
 
